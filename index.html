@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My BookTok Shelf</title>
-<meta name="description" content="Search public-domain classics, drag covers onto a cozy vertical bookshelf, tweak shelves and fairy lights, and tilt books with a double-click." />
+<meta name="description" content="Search public-domain classics, drag covers onto a cozy vertical bookshelf, tweak shelves and fairy lights, tilt books with a double-click, and remove books easily." />
 <link rel="preconnect" href="https://openlibrary.org">
 <link rel="preconnect" href="https://covers.openlibrary.org">
 <style>
@@ -17,7 +17,7 @@ header{position:sticky;top:0;z-index:10;background:#fffaf8;border-bottom:1px sol
 .bar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
 label{font:15px/1.2 ui-sans-serif,system-ui;color:#4a3f39;display:flex;align-items:center;gap:8px}
 select,input[type=checkbox]{padding:6px 10px;border-radius:10px;border:1px solid #e3d7cf;background:#fff}
-.instructions{font:14px/1.4 ui-sans-serif,system-ui;color:#5b4e47;margin-top:4px;text-align:center}
+.instructions{font:14px/1.5 ui-sans-serif,system-ui;color:#5b4e47;margin:6px auto 10px;text-align:center;max-width:1000px}
 
 /* Layout */
 main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:360px 1fr;gap:16px}
@@ -43,6 +43,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .board::before{left:0;border-radius:22px 0 0 22px}
 .board::after{right:0;border-radius:0 22px 22px 0}
 
+/* Fairy lights */
 .fairy{position:absolute;top:56px;left:18px;right:18px;height:22px;pointer-events:none;background:
   radial-gradient(6px 6px at 0% 60%, rgba(255,240,180,.95), transparent 60%),
   radial-gradient(6px 6px at 10% 40%, rgba(255,220,200,.95), transparent 60%),
@@ -54,14 +55,22 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   radial-gradient(6px 6px at 70% 40%, rgba(210,240,255,.95), transparent 60%),
   radial-gradient(6px 6px at 80% 60%, rgba(255,220,200,.95), transparent 60%),
   radial-gradient(6px 6px at 90% 40%, rgba(255,240,180,.95), transparent 60%)}
+.fairy.hidden{display:none;}
+
 .shelves{position:absolute;inset:72px 10px 76px 10px}
 .shelf{position:absolute;left:8px;right:8px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
 
-.book{position:absolute;bottom:6px;max-height:calc(100% - 12px);border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease}
+/* Books */
+.book{position:absolute;bottom:6px;max-height:calc(100% - 12px);border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease, box-shadow .2s ease}
 .book:hover{filter:brightness(1.05)}
+.book.selected{box-shadow:0 0 0 3px #ffd7d7, 0 12px 22px rgba(0,0,0,.30)}
 .book img{height:100%;width:auto;object-fit:contain;border-radius:10px;display:block}
 .book::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
+
+/* Remove button on hover */
+.remove-btn{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:999px;background:#fff;border:1px solid #e1c9c0;box-shadow:0 4px 10px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font:700 16px/1 ui-sans-serif,system-ui;color:#7a4a3a;opacity:0;transition:opacity .15s ease;cursor:pointer}
+.book:hover .remove-btn{opacity:1}
 
 .plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center;background-repeat:no-repeat}
 .plant.left{left:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
@@ -82,7 +91,12 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
       <label><input type="checkbox" id="lights" checked> Fairy Lights</label>
     </div>
   </div>
-  <div class="instructions">Search a classic below, drag it to your shelf, and double-click a book to tilt it 20° left or right.</div>
+  <div class="instructions">
+    <strong>How it works:</strong>
+    Search a classic below, drag a cover onto a shelf, and double-click a book to tilt it <strong>10°</strong> left or right.<br/>
+    <strong>Remove a book:</strong> hover a book and click the <strong>✕</strong>, or click a book (it highlights) and press <strong>Delete</strong>/<strong>Backspace</strong>.<br/>
+    Use the menu to change shelf count or toggle the fairy lights.
+  </div>
 </header>
 
 <main>
@@ -114,12 +128,14 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
-const resultsEl   = $('#results');
-const board       = $('#board');
-const shelvesEl   = $('#shelves');
+const resultsEl     = $('#results');
+const board         = $('#board');
+const shelvesEl     = $('#shelves');
 const shelfCountSel = $('#shelfCount');
 const lightsToggle  = $('#lights');
-const fairy       = $('#fairy');
+const fairy         = $('#fairy');
+
+let selectedBook = null;
 
 /* ------- Shelves ------- */
 function renderShelves(count=3){
@@ -170,13 +186,32 @@ function placeBookOnShelf(shelf,{title,author,src},x){
   book.className = 'book';
   book.style.setProperty('--rot','0deg');
 
-  // Double-click to toggle ±20°
+  // Click to select (for Delete key removal)
+  book.addEventListener('click', (e)=>{
+    if(selectedBook) selectedBook.classList.remove('selected');
+    selectedBook = book;
+    book.classList.add('selected');
+    e.stopPropagation();
+  });
+
+  // Double-click to toggle ±10°
   book.addEventListener('dblclick', ()=>{
     const current = (book.style.getPropertyValue('--rot')||'0deg').replace('deg','');
     const cur = parseFloat(current)||0;
-    const next = cur===0 ? (Math.random()<.5?20:-20) : 0;
+    const next = cur===0 ? (Math.random()<.5?10:-10) : 0;
     book.style.setProperty('--rot', next+'deg');
     book.style.transform = `rotate(${next}deg)`;
+  });
+
+  // Remove button
+  const remove = document.createElement('button');
+  remove.className = 'remove-btn';
+  remove.setAttribute('aria-label','Remove book');
+  remove.textContent = '✕';
+  remove.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    book.remove();
+    if(selectedBook === book) selectedBook = null;
   });
 
   const img = new Image();
@@ -199,6 +234,7 @@ function placeBookOnShelf(shelf,{title,author,src},x){
   };
 
   book.appendChild(img);
+  book.appendChild(remove);
   shelf.appendChild(book);
 }
 
@@ -283,8 +319,26 @@ shelfCountSel.addEventListener('change', ()=>{
   renderShelves(n);
 });
 
+// Reliable fairy-lights toggle via class
 lightsToggle.addEventListener('change', ()=>{
-  fairy.style.display = lightsToggle.checked ? 'block' : 'none';
+  fairy.classList.toggle('hidden', !lightsToggle.checked);
+});
+
+// Delete/Backspace removes selected book
+document.addEventListener('keydown', (e)=>{
+  if(!selectedBook) return;
+  if(e.key === 'Delete' || e.key === 'Backspace'){
+    selectedBook.remove();
+    selectedBook = null;
+  }
+});
+
+// Deselect if clicking outside
+document.addEventListener('click', (e)=>{
+  if(selectedBook && !e.target.closest('.book')){
+    selectedBook.classList.remove('selected');
+    selectedBook = null;
+  }
 });
 
 /* ------- Init ------- */
