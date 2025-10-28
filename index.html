@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My BookTok Shelf</title>
 <meta name="description" content="Aesthetic BookTok shelf: drag classics, tilt 10°, drag-reposition on shelves, tidy spacing, fairy lights, clear shelves, export PNG." />
+<link rel="preconnect" href="https://standardebooks.org">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://openlibrary.org">
 <link rel="preconnect" href="https://covers.openlibrary.org">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
@@ -54,28 +56,16 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .board::before{left:0;border-radius:22px 0 0 22px}
 .board::after{right:0;border-radius:0 22px 22px 0}
 
-/* Fairy lights */
-.fairy{
-  position:absolute; top:56px; left:18px; right:18px; height:26px; pointer-events:none; z-index:6;
-  background:
-    radial-gradient(7px 7px at 4% 55%,  rgba(255,240,180,.95), transparent 60%),
-    radial-gradient(7px 7px at 13% 45%, rgba(255,220,200,.95), transparent 60%),
-    radial-gradient(7px 7px at 22% 55%, rgba(210,240,255,.95), transparent 60%),
-    radial-gradient(7px 7px at 31% 45%, rgba(255,240,180,.95), transparent 60%),
-    radial-gradient(7px 7px at 40% 55%, rgba(210,240,255,.95), transparent 60%),
-    radial-gradient(7px 7px at 49% 45%, rgba(255,220,200,.95), transparent 60%),
-    radial-gradient(7px 7px at 58% 55%, rgba(255,240,180,.95), transparent 60%),
-    radial-gradient(7px 7px at 67% 45%, rgba(210,240,255,.95), transparent 60%),
-    radial-gradient(7px 7px at 76% 55%, rgba(255,220,200,.95), transparent 60%),
-    radial-gradient(7px 7px at 85% 45%, rgba(255,240,180,.95), transparent 60%),
-    radial-gradient(7px 7px at 94% 55%, rgba(210,240,255,.95), transparent 60%);
-  animation: twinkle 2.4s infinite ease-in-out alternate;
-}
-@keyframes twinkle{
-  0% { opacity:.7; filter:drop-shadow(0 0 2px rgba(255,243,200,.7)); }
-  100%{ opacity:1; filter:drop-shadow(0 0 6px rgba(255,243,200,1)); }
-}
-.fairy.hidden{display:none}
+/* New: Fairy lights as DOM spans for reliable rendering */
+.fairy{position:absolute;top:54px;left:20px;right:20px;height:28px;display:flex;justify-content:space-between;align-items:center;z-index:6;pointer-events:none}
+.fairy.hidden{visibility:hidden}
+.bulb{width:10px;height:10px;border-radius:50%;background:#ffe89a;box-shadow:0 0 6px rgba(255,243,200,.9), 0 0 2px rgba(255,243,200,.7);animation:twinkle 2.4s ease-in-out infinite alternate}
+.bulb:nth-child(3n){background:#ffd2d2}
+.bulb:nth-child(3n+1){background:#d7ecff}
+.bulb:nth-child(3n+2){background:#fff2c0}
+.bulb:nth-child(odd){animation-duration:2.1s}
+.bulb:nth-child(4n){animation-duration:2.7s}
+@keyframes twinkle{0%{opacity:.7}100%{opacity:1;filter:brightness(1.1)}}
 
 /* Shelves & layering */
 .shelves{position:absolute;inset:72px 10px 76px 10px; z-index:1;}
@@ -118,8 +108,8 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   </div>
   <div class="instructions">
     <strong>How it works:</strong>
-    Drag a classic onto a shelf. <strong>Double-click</strong> a book to tilt <strong>10°</strong>. <strong>Click-hold and drag</strong> a placed book to reposition it along the shelf; it will <strong>snap and keep spacing</strong> on release.<br/>
-    <strong>Remove:</strong> click <strong>✕</strong> on hover, or select (pink outline) and press <strong>Delete</strong>/<strong>Backspace</strong>. Use the menu to toggle lights, change shelf count, clear shelves, or save a PNG.
+    Drag a classic onto a shelf. <strong>Double-click</strong> a book to tilt <strong>10°</strong>. <strong>Click-hold and drag</strong> a placed book to reposition; it keeps tidy spacing on release.<br/>
+    <strong>Remove:</strong> click <strong>✕</strong> on hover, or select (pink outline) and press <strong>Delete</strong>/<strong>Backspace</strong>.
   </div>
 </header>
 
@@ -133,7 +123,6 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
           <input id="q" placeholder="Search public-domain classics (e.g., pride and prejudice)"/>
           <button class="btn" id="go" aria-label="Search">Search</button>
         </div>
-        <label style="gap:6px"><input type="checkbox" id="realCovers"> Use real covers for curated</label>
       </div>
       <div id="results" class="results" aria-live="polite"></div>
     </div>
@@ -142,7 +131,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   <section class="workspace">
     <div class="board-outer">
       <div class="board" id="board">
-        <div class="fairy" id="fairy"></div>
+        <div class="fairy" id="fairy" aria-hidden="true"></div>
         <div id="shelves" class="shelves"></div>
         <div class="plant left" aria-hidden="true"></div>
         <div class="plant right" aria-hidden="true"></div>
@@ -163,36 +152,36 @@ const lightsToggle  = $('#lights');
 const fairy         = $('#fairy');
 const clearBtn      = $('#clearBtn');
 const saveBtn       = $('#saveBtn');
-const realCoversTgl = $('#realCovers');
 
 let selectedBook = null;
 
-/* ===== GUARANTEED MATCH CURATED LIST =====
-   Default uses SVG titleplates so title/author ALWAYS match.
-   Toggle "Use real covers" to fetch Open Library jackets by coverId.
-*/
+/* ===== Standard Ebooks cover helper (raw GitHub cover.jpg) =====
+   Each Standard Ebooks repo includes ./images/cover.jpg (1400×2100). :contentReference[oaicite:1]{index=1} */
+function seCover(repoSlug){
+  return `https://raw.githubusercontent.com/standardebooks/${repoSlug}/master/images/cover.jpg`;
+}
+
+/* ===== Curated with Standard Ebooks covers =====
+   (Public-domain + CC0 contributions by SE; see their pages.) :contentReference[oaicite:2]{index=2} */
 const curated = [
-  {title:'Pride and Prejudice', author:'Jane Austen',          coverId:8231856},
-  {title:'Little Women',        author:'Louisa May Alcott',    coverId:10523369},
-  {title:'Jane Eyre',           author:'Charlotte Brontë',     coverId:10509349},
-  {title:'Wuthering Heights',   author:'Emily Brontë',         coverId:8231561},
-  {title:'The Picture of Dorian Gray', author:'Oscar Wilde',   coverId:8231996},
-  {title:'Anna Karenina',       author:'Leo Tolstoy',          coverId:10706347},
-  {title:'Emma',                author:'Jane Austen',          coverId:10923255},
-  {title:'Sense and Sensibility', author:'Jane Austen',        coverId:8232100},
-  {title:'The Secret Garden',   author:'F. H. Burnett',        coverId:8782474},
-  {title:'A Little Princess',   author:'F. H. Burnett',        coverId:8231186},
-  {title:'Persuasion',          author:'Jane Austen',          coverId:10526035},
-  {title:'The Scarlet Pimpernel', author:'Baroness Orczy',     coverId:8231721},
+  {title:'Pride and Prejudice', author:'Jane Austen',          src: seCover('jane-austen_pride-and-prejudice')},
+  {title:'Little Women',        author:'Louisa May Alcott',    src: seCover('louisa-may-alcott_little-women')},
+  {title:'Jane Eyre',           author:'Charlotte Brontë',     src: seCover('charlotte-bronte_jane-eyre')},
+  {title:'Wuthering Heights',   author:'Emily Brontë',         src: seCover('emily-bronte_wuthering-heights')},
+  {title:'The Picture of Dorian Gray', author:'Oscar Wilde',   src: seCover('oscar-wilde_the-picture-of-dorian-gray')},
+  {title:'Anna Karenina',       author:'Leo Tolstoy',          src: seCover('leo-tolstoy_anna-karenina')},
+  {title:'Emma',                author:'Jane Austen',          src: seCover('jane-austen_emma')},
+  {title:'Sense and Sensibility', author:'Jane Austen',        src: seCover('jane-austen_sense-and-sensibility')},
+  {title:'The Secret Garden',   author:'Frances Hodgson Burnett', src: seCover('frances-hodgson-burnett_the-secret-garden')},
+  {title:'A Little Princess',   author:'Frances Hodgson Burnett', src: seCover('frances-hodgson-burnett_a-little-princess')},
+  {title:'Persuasion',          author:'Jane Austen',          src: seCover('jane-austen_persuasion')},
+  {title:'The Scarlet Pimpernel', author:'Baroness Orczy',     src: seCover('baroness-orczy_the-scarlet-pimpernel')},
 ];
 
-function coverURLFromId(id){ return id ? `https://covers.openlibrary.org/b/id/${id}-L.jpg` : ''; }
-
-/* ===== SHELVES RENDER ===== */
+/* ===== Shelves render ===== */
 function renderShelves(count=3){
   shelvesEl.innerHTML='';
   const labels = count===2 ? ['Favorites','Classics'] : ['Top Picks','TBR','Classics'];
-
   const rect = board.getBoundingClientRect();
   const boardH = (rect.height || board.offsetHeight || 640);
   const topPad = 84, bottomPad = 96;
@@ -210,13 +199,12 @@ function renderShelves(count=3){
     plaque.className='plaque';
     plaque.textContent=labels[i]||`Shelf ${i+1}`;
     shelf.appendChild(plaque);
-
     shelvesEl.appendChild(shelf);
   }
   bindShelfDnD();
 }
 
-/* ===== DRAG & DROP (from Discover) ===== */
+/* ===== DnD from Discover ===== */
 function bindShelfDnD(){
   $$('.shelf').forEach(shelf => {
     shelf.addEventListener('dragover', e => e.preventDefault());
@@ -232,13 +220,12 @@ function bindShelfDnD(){
   });
 }
 
-/* ===== PLACE BOOK + HORIZONTAL DRAG-REPOSITION ===== */
+/* ===== Place + horizontal drag ===== */
 function placeBookOnShelf(shelf,{title,author,src},x){
   const book = document.createElement('div');
   book.className = 'book';
   book.style.setProperty('--rot','0deg');
 
-  // selection (for Delete)
   book.addEventListener('click', (e)=>{
     if(selectedBook) selectedBook.classList.remove('selected');
     selectedBook = book;
@@ -246,7 +233,6 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     e.stopPropagation();
   });
 
-  // double-click tilt ±10°
   book.addEventListener('dblclick', ()=>{
     const current = (book.style.getPropertyValue('--rot')||'0deg').replace('deg','');
     const cur = parseFloat(current)||0;
@@ -255,7 +241,6 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     book.style.transform = `rotate(${next}deg)`;
   });
 
-  // remove button
   const remove = document.createElement('button');
   remove.className = 'remove-btn';
   remove.setAttribute('aria-label','Remove book');
@@ -268,19 +253,18 @@ function placeBookOnShelf(shelf,{title,author,src},x){
 
   const img = new Image();
   img.alt = `${title||''}${author? ' — '+author: ''}`;
+  img.crossOrigin = 'anonymous';
   img.referrerPolicy = 'no-referrer';
-  img.src = src || titleplateCover(title,author);
+  img.src = src;
 
   img.onload = ()=>{
-    const root = getComputedStyle(document.documentElement);
-    const padPx = parseInt(root.getPropertyValue('--book-pad'))||6;
+    const padPx = 6;
     const targetH = shelf.clientHeight - (padPx*2);
-    const scale = targetH / (img.naturalHeight || 550);
-    const w = Math.max(60, Math.round((img.naturalWidth || 400) * scale));
+    const scale = targetH / (img.naturalHeight || 2100);
+    const w = Math.max(60, Math.round((img.naturalWidth || 1400) * scale));
     book.style.height = targetH + 'px';
     book.style.width = w + 'px';
 
-    // initial left proposal
     const leftLimit = 6;
     const rightLimit = shelf.clientWidth - w - 6;
     let left = (x ?? 40) - w/2;
@@ -290,29 +274,21 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     shelf.appendChild(book);
     book.appendChild(img);
     book.appendChild(remove);
-
-    // enable horizontal drag
     enableHorizontalDrag(book, shelf);
-
-    // enforce tidy gaps after placement
     enforceSpacing(shelf);
   };
 
   img.onerror = ()=>{
-    shelf.appendChild(book);
-    book.appendChild(img);
-    book.appendChild(remove);
-    enableHorizontalDrag(book, shelf);
-    enforceSpacing(shelf);
+    // fall back to a simple plate if a cover URL ever fails
+    const fallback = titleplateCover(title,author);
+    img.src = fallback;
   };
 }
 
-/* Horizontal drag within the shelf */
 function enableHorizontalDrag(book, shelf){
   let dragging=false, startX=0, startLeft=0;
 
   const onDown = (e)=>{
-    // ignore clicks on the remove button
     if(e.target.closest('.remove-btn')) return;
     dragging=true;
     startX = (e.touches ? e.touches[0].clientX : e.clientX);
@@ -350,10 +326,8 @@ function enableHorizontalDrag(book, shelf){
   book.addEventListener('touchstart', onDown, {passive:true});
 }
 
-/* Neat spacing between books with a minimum gutter */
 function enforceSpacing(shelf){
-  const gutter = 10; // px
-  const pad = 6;
+  const gutter = 10, pad = 6;
   const shelfW = shelf.clientWidth;
   const books = Array.from(shelf.querySelectorAll('.book'));
   if(!books.length) return;
@@ -364,7 +338,6 @@ function enforceSpacing(shelf){
     return {el, w, left};
   }).sort((a,b)=>a.left - b.left);
 
-  // forward push to keep gaps
   arr[0].left = Math.max(pad, arr[0].left);
   for(let i=1;i<arr.length;i++){
     const prev = arr[i-1];
@@ -372,7 +345,6 @@ function enforceSpacing(shelf){
     arr[i].left = Math.max(minLeft, arr[i].left);
   }
 
-  // clamp to right and pull if overflow
   const overflow = (arr.at(-1).left + arr.at(-1).w + pad) - shelfW;
   if(overflow > 0){
     for(let i=arr.length-1;i>=0;i--){
@@ -382,36 +354,32 @@ function enforceSpacing(shelf){
       arr[i].left = Math.max(arr[i].left, arr[i-1].left + arr[i-1].w + gutter);
     }
   }
-
   arr.forEach(it => it.el.style.left = Math.round(it.left) + 'px');
 }
 
-/* ===== TITLE-PLATE (SVG) — always matches text ===== */
+/* Title-plate fallback (used only if a SE cover fails) */
 function titleplateCover(title,author){
   const t=(title||'Untitled').slice(0,42).replace(/&/g,'&amp;');
   const a=(author||'').slice(0,34).replace(/&/g,'&amp;');
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='550'>
-    <defs>
-      <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-        <stop offset='0%' stop-color='#f7dff0'/><stop offset='100%' stop-color='#d9ecff'/>
-      </linearGradient>
-    </defs>
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='2100'>
+    <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#f7dff0'/><stop offset='100%' stop-color='#d9ecff'/></linearGradient></defs>
     <rect width='100%' height='100%' fill='url(#g)'/>
-    <rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.45)' stroke='rgba(0,0,0,.08)'/>
-    <text x='34' y='270' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text>
-    <text x='34' y='310' font-family='Georgia,serif' font-size='16' fill='#5a5552'>${a}</text>
+    <rect x='40' y='40' width='1320' height='2020' rx='40' fill='rgba(255,255,255,.45)' stroke='rgba(0,0,0,.08)'/>
+    <text x='100' y='1050' font-family='Georgia,serif' font-size='84' fill='#2b2a2a'>${t}</text>
+    <text x='100' y='1150' font-family='Georgia,serif' font-size='48' fill='#5a5552'>${a}</text>
   </svg>`;
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 }
 
-/* ===== DISCOVER GRID ===== */
-function makeCardFromData({title, author, coverId, useReal}){
+/* Discover grid (curated SE covers by default; search = Open Library) */
+function makeCard({title, author, src}){
   const card = document.createElement('div');
   card.className = 'book-card';
-  const src = useReal && coverId ? coverURLFromId(coverId) : titleplateCover(title,author);
 
   const im=new Image();
   im.decoding='async'; im.loading='lazy'; im.src=src; im.alt=`${title}${author?' — '+author:''}`;
+  im.crossOrigin='anonymous';
   card.appendChild(im);
 
   const ttl=document.createElement('div');
@@ -430,16 +398,13 @@ function makeCardFromData({title, author, coverId, useReal}){
 function renderCurated(){
   resultsEl.innerHTML = '';
   const frag = document.createDocumentFragment();
-  curated.forEach(d => {
-    frag.appendChild(makeCardFromData({title:d.title, author:d.author, coverId:d.coverId, useReal:realCoversTgl.checked}));
-  });
+  curated.forEach(d => frag.appendChild(makeCard(d)));
   resultsEl.appendChild(frag);
 }
 
 async function searchBooks(q){
   resultsEl.innerHTML = '';
   if(!q || !q.trim()){ renderCurated(); return; }
-
   const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&has_fulltext=true&language=eng&limit=24`;
   try{
     const res = await fetch(url);
@@ -454,22 +419,8 @@ async function searchBooks(q){
       const title  = d.title || 'Untitled';
       const author = (d.author_name && d.author_name[0]) || '';
       const coverId = d.cover_i;
-      // For search results we prefer real covers; if missing, fall back to titleplate
-      const src = coverId ? coverURLFromId(coverId) : titleplateCover(title,author);
-      const card = document.createElement('div');
-      card.className = 'book-card';
-
-      const im=new Image(); im.decoding='async'; im.loading='lazy'; im.src=src; im.alt=`${title}${author?' — '+author:''}`;
-      card.appendChild(im);
-
-      const ttl=document.createElement('div'); ttl.className='ttl'; ttl.textContent=`${title}${author?' — '+author:''}`;
-      card.appendChild(ttl);
-
-      const payload = {title, author, src};
-      card.draggable = true;
-      card.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('text/plain', JSON.stringify(payload));
-      });
+      const src = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : titleplateCover(title,author);
+      const card = makeCard({title, author, src});
       frag.appendChild(card);
     });
     resultsEl.appendChild(frag);
@@ -479,13 +430,14 @@ async function searchBooks(q){
   }
 }
 
-/* ===== UTIL ACTIONS ===== */
+/* Clear & Save */
 function clearShelves(){
   $$('.shelf .book').forEach(b => b.remove());
   selectedBook = null;
 }
 
 async function savePNG(){
+  // ensure lights reflect current toggle
   fairy.classList.toggle('hidden', !lightsToggle.checked);
   const canvas = await html2canvas(board, {useCORS:true, backgroundColor:null, scale:2});
   const data = canvas.toDataURL('image/png');
@@ -495,7 +447,17 @@ async function savePNG(){
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* ===== BINDINGS ===== */
+/* Fairy bulbs builder */
+function buildFairyBulbs(n=20){
+  fairy.innerHTML = '';
+  for(let i=0;i<n;i++){
+    const s = document.createElement('span');
+    s.className = 'bulb';
+    fairy.appendChild(s);
+  }
+}
+
+/* Bindings */
 $('#go').addEventListener('click', ()=> searchBooks($('#q').value));
 $('#q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ searchBooks($('#q').value); } });
 
@@ -507,8 +469,6 @@ shelfCountSel.addEventListener('change', ()=>{
 lightsToggle.addEventListener('change', ()=>{
   fairy.classList.toggle('hidden', !lightsToggle.checked);
 });
-
-realCoversTgl.addEventListener('change', renderCurated);
 
 clearBtn.addEventListener('click', ()=>{
   if (event && (event.shiftKey || confirm('Clear all shelves?'))) clearShelves();
@@ -534,11 +494,12 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-/* ===== INIT ===== */
+/* Init */
 renderShelves(parseInt(shelfCountSel.value,10)||3);
 renderCurated();
+buildFairyBulbs(21);               // make bulbs
 lightsToggle.checked = true;
-fairy.classList.remove('hidden');
+fairy.classList.toggle('hidden', !lightsToggle.checked);
 </script>
 </body>
 </html>
