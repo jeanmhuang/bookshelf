@@ -4,18 +4,21 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My BookTok Shelf</title>
-<meta name="description" content="Search public‑domain classics, drag covers onto a cozy vertical bookshelf, tweak shelves and fairy lights, and tilt books with a double‑click." />
+<meta name="description" content="Search public-domain classics, drag covers onto a cozy vertical bookshelf, tweak shelves and fairy lights, and tilt books with a double-click." />
 <link rel="preconnect" href="https://openlibrary.org">
 <link rel="preconnect" href="https://covers.openlibrary.org">
 <style>
 :root{ --bg:#f6f1ee; --ink:#2c2624; --muted:#7b6d66; --pearl:#fffbf7; --wood1:#b07a52; --wood2:#6f4b34; --shadow:0 16px 44px rgba(0,0,0,.10); }
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.35 ui-serif, Georgia, serif}
+
 /* Header */
 header{position:sticky;top:0;z-index:10;background:#fffaf8;border-bottom:1px solid #eadfd9;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.bar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center}
+.bar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
 label{font:15px/1.2 ui-sans-serif,system-ui;color:#4a3f39;display:flex;align-items:center;gap:8px}
 select,input[type=checkbox]{padding:6px 10px;border-radius:10px;border:1px solid #e3d7cf;background:#fff}
+.instructions{font:14px/1.4 ui-sans-serif,system-ui;color:#5b4e47;margin-top:4px;text-align:center}
+
 /* Layout */
 main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:360px 1fr;gap:16px}
 @media (max-width: 960px){ main{grid-template-columns:1fr} }
@@ -30,15 +33,16 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .book-card{position:relative;border-radius:12px;overflow:hidden;background:#f5f1ee;border:1px solid #e9dfd8;display:flex;align-items:center;justify-content:center;cursor:grab;min-height:170px}
 .book-card img{width:100%;height:100%;object-fit:cover;display:block}
 .book-card .ttl{position:absolute;inset:auto 6px 6px 6px;background:linear-gradient(180deg,rgba(0,0,0,.0), rgba(0,0,0,.55));color:#fff;padding:6px 8px;border-radius:8px;font:12px/1.2 ui-sans-serif, system-ui}
+
 /* Board */
 .workspace{display:flex;flex-direction:column;gap:12px}
 .board-outer{display:flex;justify-content:center;align-items:center;padding:8px}
 .board{position:relative;width:380px;height:640px;border-radius:22px;background:linear-gradient(180deg,#f6ebe3,#fffdfa);box-shadow: inset 0 0 0 1px #ead8cf, inset 0 30px 80px rgba(190,150,120,.25), var(--shadow);overflow:hidden}
 @media (min-width:1024px){ .board{width:540px;height:960px} }
-/* Frame & decor */
 .board::before,.board::after{content:"";position:absolute;top:0;bottom:0;width:12px;background:linear-gradient(180deg,#ccb19a,#b69074);box-shadow:inset 0 1px 0 #fff6}
 .board::before{left:0;border-radius:22px 0 0 22px}
 .board::after{right:0;border-radius:0 22px 22px 0}
+
 .fairy{position:absolute;top:56px;left:18px;right:18px;height:22px;pointer-events:none;background:
   radial-gradient(6px 6px at 0% 60%, rgba(255,240,180,.95), transparent 60%),
   radial-gradient(6px 6px at 10% 40%, rgba(255,220,200,.95), transparent 60%),
@@ -53,20 +57,22 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .shelves{position:absolute;inset:72px 10px 76px 10px}
 .shelf{position:absolute;left:8px;right:8px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
-/* Book on shelf */
+
 .book{position:absolute;bottom:6px;max-height:calc(100% - 12px);border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease}
 .book:hover{filter:brightness(1.05)}
 .book img{height:100%;width:auto;object-fit:contain;border-radius:10px;display:block}
 .book::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
-/* Plants */
+
 .plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center;background-repeat:no-repeat}
 .plant.left{left:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
 .plant.right{right:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
 </style>
 </head>
 <body>
-  <header>
-    <div class="bar">
+<header>
+  <div class="bar">
+    <h1 style="flex:1;text-align:center;font-family:'Georgia',serif;font-size:28px;font-weight:700;color:#3a2e2a;letter-spacing:.5px">✨ BookTok Aesthetic Bookshelf</h1>
+    <div style="display:flex;gap:16px;align-items:center;">
       <label>Shelves:
         <select id="shelfCount">
           <option value="2">2</option>
@@ -75,66 +81,75 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
       </label>
       <label><input type="checkbox" id="lights" checked> Fairy Lights</label>
     </div>
-  </header>
+  </div>
+  <div class="instructions">Search a classic below, drag it to your shelf, and double-click a book to tilt it 20° left or right.</div>
+</header>
 
-  <main>
-    <!-- Search / Picks -->
-    <section class="panel" aria-label="Search and picks">
-      <h2>Discover Classics</h2>
-      <div class="content">
-        <div class="pill">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.3-4.3" stroke="#7b6d66" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#7b6d66" stroke-width="1.6" fill="none"/></svg>
-          <input id="q" placeholder="Search public‑domain classics (e.g., pride and prejudice)"/>
-          <button class="btn" id="go">Search</button>
-        </div>
-        <div class="results" id="results" aria-live="polite"></div>
+<main>
+  <section class="panel" aria-label="Search and picks">
+    <h2>Discover Classics</h2>
+    <div class="content">
+      <div class="pill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.3-4.3" stroke="#7b6d66" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#7b6d66" stroke-width="1.6" fill="none"/></svg>
+        <input id="q" placeholder="Search public-domain classics (e.g., pride and prejudice)"/>
+        <button class="btn" id="go" aria-label="Search">Search</button>
       </div>
-    </section>
+      <div class="results" id="results" aria-live="polite"></div>
+    </div>
+  </section>
 
-    <!-- Workspace / Board -->
-    <section class="workspace">
-      <div class="board-outer">
-        <div class="board" id="board">
-          <div class="fairy" id="fairy"></div>
-          <div id="shelves" class="shelves"></div>
-          <div class="plant left"></div>
-          <div class="plant right"></div>
-        </div>
+  <section class="workspace">
+    <div class="board-outer">
+      <div class="board" id="board">
+        <div class="fairy" id="fairy"></div>
+        <div id="shelves" class="shelves"></div>
+        <div class="plant left" aria-hidden="true"></div>
+        <div class="plant right" aria-hidden="true"></div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
+</main>
 
 <script>
-const $ = s => document.querySelector(s);
+const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const resultsEl = $('#results');
-const board = $('#board');
-const shelvesEl = $('#shelves');
-const shelfCountSel = $('#shelfCount');
-const lightsToggle = $('#lights');
-const fairy = $('#fairy');
 
-// Render dynamic shelves (2 or 3) with minimal gaps
+const resultsEl   = $('#results');
+const board       = $('#board');
+const shelvesEl   = $('#shelves');
+const shelfCountSel = $('#shelfCount');
+const lightsToggle  = $('#lights');
+const fairy       = $('#fairy');
+
+/* ------- Shelves ------- */
 function renderShelves(count=3){
   shelvesEl.innerHTML='';
-  const labels = count===2? ['Favorites','Classics'] : ['Top Picks','TBR','Classics'];
+  const labels = count===2 ? ['Favorites','Classics'] : ['Top Picks','TBR','Classics'];
+
   const rect = board.getBoundingClientRect();
-  const topPad=84, bottomPad=96; // leave room for fairy lights and plants
-  const avail = (rect.height||640) - topPad - bottomPad;
+  const boardH = (rect.height || board.offsetHeight || 640);
+  const topPad = 84, bottomPad = 96;
+  const avail  = boardH - topPad - bottomPad;
   const minGap = 8;
   const shelfH = Math.floor((avail - minGap*(count-1)) / count);
-  const gap = minGap;
+
   for(let i=0;i<count;i++){
     const shelf=document.createElement('div');
     shelf.className='shelf';
-    shelf.style.top = (topPad + i*(shelfH+gap)) + 'px';
+    shelf.style.top = (topPad + i*(shelfH+minGap)) + 'px';
     shelf.style.height = shelfH + 'px';
-    const plaque=document.createElement('div'); plaque.className='plaque'; plaque.textContent=labels[i]||`Shelf ${i+1}`; shelf.appendChild(plaque);
+
+    const plaque=document.createElement('div');
+    plaque.className='plaque';
+    plaque.textContent=labels[i]||`Shelf ${i+1}`;
+    shelf.appendChild(plaque);
+
     shelvesEl.appendChild(shelf);
   }
   bindShelfDnD();
 }
 
+/* ------- Drag & Drop ------- */
 function bindShelfDnD(){
   $$('.shelf').forEach(shelf => {
     shelf.addEventListener('dragover', e => e.preventDefault());
@@ -150,27 +165,12 @@ function bindShelfDnD(){
   });
 }
 
-// Drag source: search results
-function makeCard(d){
-  const card = document.createElement('div');
-  card.className = 'book-card';
-  const title = d.title || 'Untitled';
-  const author = (d.author_name && d.author_name[0]) || '';
-  const coverId = d.cover_i;
-  const src = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : '';
-  if(src){ const im=new Image(); im.src=src; im.alt=`${title} — ${author}`; im.loading='lazy'; card.appendChild(im);} else { card.innerHTML = `<div class='ttl'>${title}</div>`; }
-  const ttl=document.createElement('div'); ttl.className='ttl'; ttl.textContent=`${title}${author?' — '+author:''}`; card.appendChild(ttl);
-  const payload = {title, author, src};
-  card.draggable = true;
-  card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', JSON.stringify(payload)); });
-  return card;
-}
-
 function placeBookOnShelf(shelf,{title,author,src},x){
   const book = document.createElement('div');
   book.className = 'book';
-  // default straight; toggle tilt on double click (+/-20deg)
   book.style.setProperty('--rot','0deg');
+
+  // Double-click to toggle ±20°
   book.addEventListener('dblclick', ()=>{
     const current = (book.style.getPropertyValue('--rot')||'0deg').replace('deg','');
     const cur = parseFloat(current)||0;
@@ -178,71 +178,120 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     book.style.setProperty('--rot', next+'deg');
     book.style.transform = `rotate(${next}deg)`;
   });
+
   const img = new Image();
   img.alt = `${title||''}${author? ' — '+author: ''}`;
   img.referrerPolicy = 'no-referrer';
-  if(src) img.src = src; else img.src = placeholderCover(title,author);
+  img.src = src || placeholderCover(title,author);
+
   img.onload = ()=>{
-    // Set width using natural aspect ratio to keep original proportions
-    const targetH = shelf.clientHeight - 12; // match CSS max-height calc(100% - 12px)
+    const targetH = shelf.clientHeight - 12; // nearly full shelf height
     const scale = targetH / img.naturalHeight;
-    const w = Math.max(60, Math.round(img.naturalWidth * scale));
+    const w = Math.max(60, Math.round(img.naturalWidth * scale)); // preserve aspect ratio
     book.style.height = targetH + 'px';
     book.style.width = w + 'px';
-    // Position horizontally near drop x; keep inside bounds
-    const shelfRect = shelf.getBoundingClientRect();
-    let left = (x||40) - w/2; // center on cursor
-    left = Math.max(6, Math.min(left, shelf.clientWidth - w - 6));
+
+    const leftLimit = 6;
+    const rightLimit = shelf.clientWidth - w - 6;
+    let left = (x||40) - w/2;
+    left = Math.max(leftLimit, Math.min(left, rightLimit));
     book.style.left = left + 'px';
   };
+
   book.appendChild(img);
   shelf.appendChild(book);
 }
 
+/* ------- Placeholder cover (data URL SVG) ------- */
 function placeholderCover(title,author){
   const t=(title||'Untitled').slice(0,36).replace(/&/g,'&amp;');
   const a=(author||'').slice(0,28).replace(/&/g,'&amp;');
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='550'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#d8ecff'/><stop offset='100%' stop-color='#ffe1ea'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.4)' stroke='rgba(0,0,0,.06)'/><text x='36' y='280' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text><text x='36' y='318' font-family='Georgia,serif' font-size='16' fill='#5a5552'>${a}</text></svg>`;
-  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='550'>
+    <defs>
+      <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='#d8ecff'/>
+        <stop offset='100%' stop-color='#ffe1ea'/>
+      </linearGradient>
+    </defs>
+    <rect width='100%' height='100%' fill='url(#g)'/>
+    <rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.4)' stroke='rgba(0,0,0,.06)'/>
+    <text x='36' y='280' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text>
+    <text x='36' y='318' font-family='Georgia,serif' font-size='16' fill='#5a5552'>${a}</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 }
 
-async function doSearch(query){
-  resultsEl.innerHTML = '<div style="grid-column:1/-1;color:#6a5a53">Searching…</div>';
+/* ------- Search (Open Library) ------- */
+async function searchBooks(q){
+  resultsEl.innerHTML = '';
+  if(!q || !q.trim()) return;
+
+  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&has_fulltext=true&language=eng&limit=24`;
   try{
-    const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=18`);
+    const res = await fetch(url);
     const data = await res.json();
-    const docs = data.docs || [];
-    if(!docs.length){ resultsEl.innerHTML = '<div style="grid-column:1/-1;color:#6a5a53">No results. Try another classic.</div>'; return; }
-    resultsEl.innerHTML='';
-    docs.forEach(d=> resultsEl.appendChild(makeCard(d)) );
+    const docs = (data && data.docs) ? data.docs : [];
+    if(!docs.length){
+      resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No results. Try another classic?</div>`;
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    docs.slice(0,24).forEach(d=>{
+      const card = makeCard(d);
+      frag.appendChild(card);
+    });
+    resultsEl.appendChild(frag);
   }catch(err){
     console.error(err);
-    resultsEl.innerHTML = '<div style="grid-column:1/-1;color:#6a5a53">Search error. Please try again.</div>';
+    resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">Search error. Please try again.</div>`;
   }
 }
 
-// UI wiring
-$('#go').addEventListener('click', ()=> doSearch($('#q').value || 'pride and prejudice'));
-$('#q').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#go').click(); });
+function makeCard(d){
+  const card = document.createElement('div');
+  card.className = 'book-card';
 
-const storedCount = parseInt(localStorage.getItem('booktok-shelf-count')||'3',10);
-renderShelves([2,3].includes(storedCount)? storedCount : 3);
-shelfCountSel.value = String([2,3].includes(storedCount)? storedCount : 3);
+  const title  = d.title || 'Untitled';
+  const author = (d.author_name && d.author_name[0]) || '';
+  const coverId = d.cover_i;
+  const src = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : '';
+
+  if(src){
+    const im=new Image();
+    im.src=src; im.alt=`${title} — ${author}`; im.loading='lazy';
+    card.appendChild(im);
+  }
+  const ttl=document.createElement('div');
+  ttl.className='ttl';
+  ttl.textContent=`${title}${author?' — '+author:''}`;
+  card.appendChild(ttl);
+
+  const payload = {title, author, src};
+  card.draggable = true;
+  card.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', JSON.stringify(payload));
+  });
+  return card;
+}
+
+/* ------- UI bindings ------- */
+$('#go').addEventListener('click', ()=> searchBooks($('#q').value));
+$('#q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ searchBooks($('#q').value); } });
+
 shelfCountSel.addEventListener('change', ()=>{
-  const c = parseInt(shelfCountSel.value,10);
-  localStorage.setItem('booktok-shelf-count', String(c));
-  renderShelves(c);
+  const n = parseInt(shelfCountSel.value,10)||3;
+  renderShelves(n);
 });
 
-// Fairy lights toggle
-function applyLights(){ fairy.style.display = lightsToggle.checked ? '' : 'none'; }
-lightsToggle.addEventListener('change', applyLights); applyLights();
+lightsToggle.addEventListener('change', ()=>{
+  fairy.style.display = lightsToggle.checked ? 'block' : 'none';
+});
 
-// First search
-doSearch('pride and prejudice');
+/* ------- Init ------- */
+renderShelves(parseInt(shelfCountSel.value,10)||3);
+lightsToggle.dispatchEvent(new Event('change'));
 </script>
 </body>
 </html>
-
 
 
