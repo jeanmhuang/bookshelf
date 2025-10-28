@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My BookTok Shelf</title>
-<meta name="description" content="Drag beautiful classics onto a cozy bookshelf, tilt books, toggle fairy lights, space books neatly, clear shelves, and export as PNG." />
+<meta name="description" content="Aesthetic BookTok shelf: drag classics, tilt 10°, drag-reposition on shelves, tidy spacing, fairy lights, clear shelves, export PNG." />
 <link rel="preconnect" href="https://openlibrary.org">
 <link rel="preconnect" href="https://covers.openlibrary.org">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
@@ -15,7 +15,7 @@
   --gutter:10px; --book-pad:6px;
 }
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.4 ui-serif,Georgia,serif}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.45 ui-serif,Georgia,serif}
 
 /* Header */
 header{position:sticky;top:0;z-index:20;background:#fffaf8;border-bottom:1px solid #eadfd9;box-shadow:0 2px 8px rgba(0,0,0,.05)}
@@ -37,6 +37,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .panel .content{padding:12px}
 .pill{display:flex;gap:8px;align-items:center;background:var(--pearl);border:1px solid #eadfd9;border-radius:999px;padding:8px 10px;margin-bottom:10px}
 .pill input{all:unset;flex:1;font:15px/1.2 ui-sans-serif,system-ui;color:#333}
+.controls-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media (max-width:480px){ .results{grid-template-columns:repeat(2,1fr)} }
 
@@ -46,7 +47,6 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 
 /* Workspace */
 .workspace{display:flex;flex-direction:column;gap:12px}
-.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .board-outer{display:flex;justify-content:center;align-items:center;padding:8px}
 .board{position:relative;width:380px;height:640px;border-radius:22px;background:linear-gradient(180deg,#f6ebe3,#fffdfa);box-shadow: inset 0 0 0 1px #ead8cf, inset 0 30px 80px rgba(190,150,120,.25), var(--shadow);overflow:hidden}
 @media (min-width:1024px){ .board{width:540px;height:960px} }
@@ -77,13 +77,14 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 }
 .fairy.hidden{display:none}
 
-/* Shelves and layering */
+/* Shelves & layering */
 .shelves{position:absolute;inset:72px 10px 76px 10px; z-index:1;}
 .shelf{position:absolute;left:8px;right:8px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
 
 /* Books */
-.book{position:absolute;bottom:var(--book-pad);max-height:calc(100% - (var(--book-pad)*2));border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease, box-shadow .2s ease; z-index:4;}
+.book{position:absolute;bottom:var(--book-pad);max-height:calc(100% - (var(--book-pad)*2));border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:grab;user-select:none;transition:transform .2s ease, filter .2s ease, box-shadow .15s ease; z-index:4;}
+.book:active{cursor:grabbing}
 .book:hover{filter:brightness(1.05)}
 .book.selected{box-shadow:0 0 0 3px #ffd7d7, 0 12px 22px rgba(0,0,0,.30)}
 .book img{height:100%;width:auto;object-fit:contain;border-radius:10px;display:block}
@@ -93,7 +94,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .remove-btn{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:999px;background:#fff;border:1px solid #e1c9c0;box-shadow:0 4px 10px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font:700 16px/1 ui-sans-serif,system-ui;color:#7a4a3a;opacity:0;transition:opacity .15s ease;cursor:pointer; z-index:5;}
 .book:hover .remove-btn{opacity:1}
 
-/* Plants in FRONT */
+/* Plants IN FRONT */
 .plant{position:absolute;bottom:10px;width:140px;height:140px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center bottom;background-repeat:no-repeat;z-index:5;pointer-events:none}
 .plant.left{left:8px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
 .plant.right{right:8px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
@@ -117,9 +118,8 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   </div>
   <div class="instructions">
     <strong>How it works:</strong>
-    Pick a book below (or search), drag it onto a shelf, and double-click to tilt <strong>10°</strong> left or right.<br/>
-    <strong>Remove:</strong> click <strong>✕</strong> on hover, or select (pink outline) and press <strong>Delete</strong>/<strong>Backspace</strong>.<br/>
-    Books automatically <strong>space themselves</strong> so the shelf never looks crowded. Use the menu to change shelf count, toggle lights, <strong>Clear Shelves</strong>, or <strong>Save PNG</strong>.
+    Drag a classic onto a shelf. <strong>Double-click</strong> a book to tilt <strong>10°</strong>. <strong>Click-hold and drag</strong> a placed book to reposition it along the shelf; it will <strong>snap and keep spacing</strong> on release.<br/>
+    <strong>Remove:</strong> click <strong>✕</strong> on hover, or select (pink outline) and press <strong>Delete</strong>/<strong>Backspace</strong>. Use the menu to toggle lights, change shelf count, clear shelves, or save a PNG.
   </div>
 </header>
 
@@ -127,10 +127,13 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   <section class="panel" aria-label="Discover and search">
     <h2>Discover Classics</h2>
     <div class="content">
-      <div class="pill">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.3-4.3" stroke="#7b6d66" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#7b6d66" stroke-width="1.6" fill="none"/></svg>
-        <input id="q" placeholder="Search public-domain classics (e.g., pride and prejudice)"/>
-        <button class="btn" id="go" aria-label="Search">Search</button>
+      <div class="controls-row">
+        <div class="pill" style="flex:1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.3-4.3" stroke="#7b6d66" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#7b6d66" stroke-width="1.6" fill="none"/></svg>
+          <input id="q" placeholder="Search public-domain classics (e.g., pride and prejudice)"/>
+          <button class="btn" id="go" aria-label="Search">Search</button>
+        </div>
+        <label style="gap:6px"><input type="checkbox" id="realCovers"> Use real covers for curated</label>
       </div>
       <div id="results" class="results" aria-live="polite"></div>
     </div>
@@ -160,23 +163,27 @@ const lightsToggle  = $('#lights');
 const fairy         = $('#fairy');
 const clearBtn      = $('#clearBtn');
 const saveBtn       = $('#saveBtn');
+const realCoversTgl = $('#realCovers');
 
 let selectedBook = null;
 
-/* ===== PRE-POPULATED, COVER-LOCKED GRID (title/author/cover match) ===== */
+/* ===== GUARANTEED MATCH CURATED LIST =====
+   Default uses SVG titleplates so title/author ALWAYS match.
+   Toggle "Use real covers" to fetch Open Library jackets by coverId.
+*/
 const curated = [
   {title:'Pride and Prejudice', author:'Jane Austen',          coverId:8231856},
   {title:'Little Women',        author:'Louisa May Alcott',    coverId:10523369},
   {title:'Jane Eyre',           author:'Charlotte Brontë',     coverId:10509349},
   {title:'Wuthering Heights',   author:'Emily Brontë',         coverId:8231561},
-  {title:'Dorian Gray',         author:'Oscar Wilde',          coverId:8231996},
+  {title:'The Picture of Dorian Gray', author:'Oscar Wilde',   coverId:8231996},
   {title:'Anna Karenina',       author:'Leo Tolstoy',          coverId:10706347},
   {title:'Emma',                author:'Jane Austen',          coverId:10923255},
-  {title:'Sense & Sensibility', author:'Jane Austen',          coverId:8232100},
+  {title:'Sense and Sensibility', author:'Jane Austen',        coverId:8232100},
   {title:'The Secret Garden',   author:'F. H. Burnett',        coverId:8782474},
   {title:'A Little Princess',   author:'F. H. Burnett',        coverId:8231186},
   {title:'Persuasion',          author:'Jane Austen',          coverId:10526035},
-  {title:'Scarlet Pimpernel',   author:'Baroness Orczy',       coverId:8231721},
+  {title:'The Scarlet Pimpernel', author:'Baroness Orczy',     coverId:8231721},
 ];
 
 function coverURLFromId(id){ return id ? `https://covers.openlibrary.org/b/id/${id}-L.jpg` : ''; }
@@ -209,7 +216,7 @@ function renderShelves(count=3){
   bindShelfDnD();
 }
 
-/* ===== DND & BOOK PLACEMENT WITH SPACING ===== */
+/* ===== DRAG & DROP (from Discover) ===== */
 function bindShelfDnD(){
   $$('.shelf').forEach(shelf => {
     shelf.addEventListener('dragover', e => e.preventDefault());
@@ -225,12 +232,13 @@ function bindShelfDnD(){
   });
 }
 
+/* ===== PLACE BOOK + HORIZONTAL DRAG-REPOSITION ===== */
 function placeBookOnShelf(shelf,{title,author,src},x){
   const book = document.createElement('div');
   book.className = 'book';
   book.style.setProperty('--rot','0deg');
 
-  // select for Delete
+  // selection (for Delete)
   book.addEventListener('click', (e)=>{
     if(selectedBook) selectedBook.classList.remove('selected');
     selectedBook = book;
@@ -261,12 +269,14 @@ function placeBookOnShelf(shelf,{title,author,src},x){
   const img = new Image();
   img.alt = `${title||''}${author? ' — '+author: ''}`;
   img.referrerPolicy = 'no-referrer';
-  img.src = src || placeholderCover(title,author);
+  img.src = src || titleplateCover(title,author);
 
   img.onload = ()=>{
-    const targetH = shelf.clientHeight - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--book-pad'))*2 || 12);
-    const scale = targetH / img.naturalHeight;
-    const w = Math.max(60, Math.round(img.naturalWidth * scale));
+    const root = getComputedStyle(document.documentElement);
+    const padPx = parseInt(root.getPropertyValue('--book-pad'))||6;
+    const targetH = shelf.clientHeight - (padPx*2);
+    const scale = targetH / (img.naturalHeight || 550);
+    const w = Math.max(60, Math.round((img.naturalWidth || 400) * scale));
     book.style.height = targetH + 'px';
     book.style.width = w + 'px';
 
@@ -277,10 +287,14 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     left = Math.max(leftLimit, Math.min(left, rightLimit));
     book.style.left = left + 'px';
 
-    // mount, then enforce spacing among all books
     shelf.appendChild(book);
     book.appendChild(img);
     book.appendChild(remove);
+
+    // enable horizontal drag
+    enableHorizontalDrag(book, shelf);
+
+    // enforce tidy gaps after placement
     enforceSpacing(shelf);
   };
 
@@ -288,11 +302,55 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     shelf.appendChild(book);
     book.appendChild(img);
     book.appendChild(remove);
+    enableHorizontalDrag(book, shelf);
     enforceSpacing(shelf);
   };
 }
 
-/* Keep neat spacing between books with a minimum gutter */
+/* Horizontal drag within the shelf */
+function enableHorizontalDrag(book, shelf){
+  let dragging=false, startX=0, startLeft=0;
+
+  const onDown = (e)=>{
+    // ignore clicks on the remove button
+    if(e.target.closest('.remove-btn')) return;
+    dragging=true;
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    startLeft = parseFloat(book.style.left)||0;
+    book.style.transition='none';
+    book.classList.add('selected');
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('mouseup', onUp, {once:true});
+    document.addEventListener('touchend', onUp, {once:true});
+  };
+
+  const onMove = (e)=>{
+    if(!dragging) return;
+    const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = clientX - startX;
+    const shelfRect = shelf.getBoundingClientRect();
+    const w = (book.getBoundingClientRect().width||parseFloat(book.style.width)||80);
+    let left = startLeft + dx;
+    const min = 6;
+    const max = shelfRect.width - w - 6;
+    book.style.left = Math.max(min, Math.min(left, max)) + 'px';
+    if(e.cancelable) e.preventDefault();
+  };
+
+  const onUp = ()=>{
+    dragging=false;
+    book.style.transition='';
+    enforceSpacing(shelf);
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('touchmove', onMove);
+  };
+
+  book.addEventListener('mousedown', onDown);
+  book.addEventListener('touchstart', onDown, {passive:true});
+}
+
+/* Neat spacing between books with a minimum gutter */
 function enforceSpacing(shelf){
   const gutter = 10; // px
   const pad = 6;
@@ -300,16 +358,13 @@ function enforceSpacing(shelf){
   const books = Array.from(shelf.querySelectorAll('.book'));
   if(!books.length) return;
 
-  // gather current sizes/positions
   const arr = books.map(el=>{
     const w = el.getBoundingClientRect().width || parseFloat(el.style.width) || 80;
     const left = parseFloat(el.style.left) || 0;
     return {el, w, left};
-  });
-  // sort by left
-  arr.sort((a,b)=>a.left - b.left);
+  }).sort((a,b)=>a.left - b.left);
 
-  // forward pass: push right to ensure min gaps
+  // forward push to keep gaps
   arr[0].left = Math.max(pad, arr[0].left);
   for(let i=1;i<arr.length;i++){
     const prev = arr[i-1];
@@ -317,54 +372,48 @@ function enforceSpacing(shelf){
     arr[i].left = Math.max(minLeft, arr[i].left);
   }
 
-  // clamp last to right edge, then pull left if overflow
+  // clamp to right and pull if overflow
   const overflow = (arr.at(-1).left + arr.at(-1).w + pad) - shelfW;
   if(overflow > 0){
-    // pull everything left evenly (but not past pad/gaps)
     for(let i=arr.length-1;i>=0;i--){
       arr[i].left = Math.max(pad + i * gutter, arr[i].left - overflow);
     }
-    // ensure gaps after pull
     for(let i=1;i<arr.length;i++){
       arr[i].left = Math.max(arr[i].left, arr[i-1].left + arr[i-1].w + gutter);
     }
   }
 
-  // commit positions
-  for(const it of arr){
-    it.el.style.left = Math.round(it.left) + 'px';
-  }
+  arr.forEach(it => it.el.style.left = Math.round(it.left) + 'px');
 }
 
-/* ===== PLACEHOLDER SVG FOR MISSING COVERS ===== */
-function placeholderCover(title,author){
-  const t=(title||'Untitled').slice(0,36).replace(/&/g,'&amp;');
-  const a=(author||'').slice(0,28).replace(/&/g,'&amp;');
+/* ===== TITLE-PLATE (SVG) — always matches text ===== */
+function titleplateCover(title,author){
+  const t=(title||'Untitled').slice(0,42).replace(/&/g,'&amp;');
+  const a=(author||'').slice(0,34).replace(/&/g,'&amp;');
   const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='550'>
-    <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0%' stop-color='#d8ecff'/><stop offset='100%' stop-color='#ffe1ea'/></linearGradient></defs>
+    <defs>
+      <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='#f7dff0'/><stop offset='100%' stop-color='#d9ecff'/>
+      </linearGradient>
+    </defs>
     <rect width='100%' height='100%' fill='url(#g)'/>
-    <rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.4)' stroke='rgba(0,0,0,.06)'/>
-    <text x='36' y='280' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text>
-    <text x='36' y='318' font-family='Georgia,serif' font-size='16' fill='#5a5552'>${a}</text>
+    <rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.45)' stroke='rgba(0,0,0,.08)'/>
+    <text x='34' y='270' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text>
+    <text x='34' y='310' font-family='Georgia,serif' font-size='16' fill='#5a5552'>${a}</text>
   </svg>`;
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 }
 
-/* ===== DISCOVER GRID (CURATED + SEARCH) ===== */
-function makeCardFromData({title, author, coverId, coverSrc}){
+/* ===== DISCOVER GRID ===== */
+function makeCardFromData({title, author, coverId, useReal}){
   const card = document.createElement('div');
   card.className = 'book-card';
-  const src = coverSrc || coverURLFromId(coverId) || '';
+  const src = useReal && coverId ? coverURLFromId(coverId) : titleplateCover(title,author);
 
-  if(src){
-    const im=new Image();
-    im.decoding = 'async';
-    im.loading  = 'lazy';
-    im.src = src;
-    im.alt = `${title} — ${author||''}`;
-    card.appendChild(im);
-  }
+  const im=new Image();
+  im.decoding='async'; im.loading='lazy'; im.src=src; im.alt=`${title}${author?' — '+author:''}`;
+  card.appendChild(im);
+
   const ttl=document.createElement('div');
   ttl.className='ttl';
   ttl.textContent=`${title}${author?' — '+author:''}`;
@@ -382,7 +431,7 @@ function renderCurated(){
   resultsEl.innerHTML = '';
   const frag = document.createDocumentFragment();
   curated.forEach(d => {
-    frag.appendChild(makeCardFromData({title:d.title, author:d.author, coverId:d.coverId}));
+    frag.appendChild(makeCardFromData({title:d.title, author:d.author, coverId:d.coverId, useReal:realCoversTgl.checked}));
   });
   resultsEl.appendChild(frag);
 }
@@ -405,7 +454,23 @@ async function searchBooks(q){
       const title  = d.title || 'Untitled';
       const author = (d.author_name && d.author_name[0]) || '';
       const coverId = d.cover_i;
-      frag.appendChild(makeCardFromData({title, author, coverId}));
+      // For search results we prefer real covers; if missing, fall back to titleplate
+      const src = coverId ? coverURLFromId(coverId) : titleplateCover(title,author);
+      const card = document.createElement('div');
+      card.className = 'book-card';
+
+      const im=new Image(); im.decoding='async'; im.loading='lazy'; im.src=src; im.alt=`${title}${author?' — '+author:''}`;
+      card.appendChild(im);
+
+      const ttl=document.createElement('div'); ttl.className='ttl'; ttl.textContent=`${title}${author?' — '+author:''}`;
+      card.appendChild(ttl);
+
+      const payload = {title, author, src};
+      card.draggable = true;
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', JSON.stringify(payload));
+      });
+      frag.appendChild(card);
     });
     resultsEl.appendChild(frag);
   }catch(err){
@@ -442,6 +507,8 @@ shelfCountSel.addEventListener('change', ()=>{
 lightsToggle.addEventListener('change', ()=>{
   fairy.classList.toggle('hidden', !lightsToggle.checked);
 });
+
+realCoversTgl.addEventListener('change', renderCurated);
 
 clearBtn.addEventListener('click', ()=>{
   if (event && (event.shiftKey || confirm('Clear all shelves?'))) clearShelves();
