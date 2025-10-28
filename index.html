@@ -4,107 +4,92 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My BookTok Shelf</title>
-<meta name="description" content="Build a dreamy BookTok bookshelf with draggable covers. Search classics, drag onto shelves, save, and export a TikTok-ready image." />
-<link rel="preconnect" href="https://covers.openlibrary.org">
 <style>
 :root{
   --bg:#f6f1ee; --ink:#2c2624; --muted:#7b6d66; --pearl:#fffbf7;
-  --wood1:#b07a52; --wood2:#6f4b34; --gold:#c7a76e; --shadow:0 16px 44px rgba(0,0,0,.10);
+  --wood1:#b07a52; --wood2:#6f4b34; --shadow:0 16px 44px rgba(0,0,0,.10);
 }
-*{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.35 ui-serif, Georgia, "Times New Roman", serif}
-header{position:sticky;top:0;z-index:5;background:linear-gradient(90deg,#fffaf7, #fff);border-bottom:1px solid #eee}
-.bar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center}
-h1{font-size:clamp(20px,3.5vw,32px);margin:0;font-weight:600}
-.pill{background:var(--pearl);border:1px solid #eadfd9;padding:8px 10px;border-radius:999px;display:flex;gap:8px;align-items:center;flex:1}
-.pill input{all:unset;flex:1; font:16px/1.2 ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; color:#333}
-.btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:#222;color:#fff;font-weight:600;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.12)}
-.btn.alt{background:#fff;color:#222;border:1px solid #ddd}
-.btn.ghost{background:transparent;border:1px dashed #cbbfb7;color:#6a5a53}
-main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:340px 1fr;gap:16px}
-@media (max-width: 960px){ main{grid-template-columns:1fr} }
-.panel{background:linear-gradient(180deg,#fff, #fffaf8);border:1px solid #eee;border-radius:20px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.05)}
-.panel h2{font-size:18px;margin:0;padding:14px 16px;border-bottom:1px solid #f0e8e3;background:linear-gradient(90deg, #fff, #fff7f2)}
-.panel .content{padding:14px 12px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.chip{padding:6px 10px;border-radius:999px;border:1px solid #e7ddd7;background:#fff;color:#4a3f39;cursor:pointer;font: 13px/1 ui-sans-serif, system-ui}
-.chip:hover{background:#fff4fa}
-.results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media (max-width: 480px){ .results{grid-template-columns:repeat(2,1fr)} }
-.book-card{position:relative;border-radius:12px;overflow:hidden;background:#f5f1ee;border:1px solid #e9dfd8;display:flex;align-items:center;justify-content:center;cursor:grab;min-height:170px}
-.book-card img{width:100%;height:100%;object-fit:cover;display:block}
-.book-card .ttl{position:absolute;inset:auto 6px 6px 6px;background:linear-gradient(180deg,rgba(0,0,0,.0), rgba(0,0,0,.55));color:#fff;padding:6px 8px;border-radius:8px;font:12px/1.2 ui-sans-serif, system-ui}
-.workspace{display:flex;flex-direction:column;gap:12px}
-.canvas-wrap{background:radial-gradient(1000px 500px at 70% 10%, #fff, #fff4f0 60%, #ffece2);border:1px solid #eee;border-radius:22px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.09)}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-bottom:1px solid #efe6e0;background:linear-gradient(90deg,#fff,#fff9f6)}
-.board-outer{display:flex;justify-content:center;align-items:center;padding:16px}
-.board{position:relative;width:360px;height:640px;border-radius:22px;background:radial-gradient(80% 50% at 50% 0%, #fff 0%, #fff6 50%, #f9efe7 100%), linear-gradient(180deg,#f6ebe3,#fffdfa);box-shadow: inset 0 0 0 1px #ead8cf, inset 0 30px 80px rgba(190,150,120,.25), var(--shadow); overflow:hidden}
-@media (min-width:1024px){ .board{width:540px;height:960px} }
-/* Bookcase frame */
-.board::before, .board::after{content:"";position:absolute;top:0;bottom:0;width:12px;background:linear-gradient(180deg,#ccb19a,#b69074);box-shadow:inset 0 1px 0 #fff6}
-.board::before{left:0;border-radius:22px 0 0 22px}
-.board::after{right:0;border-radius:0 22px 22px 0}
-.room-bg{position:absolute;inset:0;background:
-  radial-gradient(120% 70% at 50% -10%, rgba(202,220,255,.35), transparent 60%),
-  radial-gradient(80% 40% at 10% 20%, rgba(217,245,230,.35), transparent 60%),
-  radial-gradient(80% 40% at 90% 20%, rgba(255,223,237,.35), transparent 60%)}
-.titleplate{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-weight:700;color:#3a2e2a;background:linear-gradient(180deg,#fff8,#fff0);backdrop-filter: blur(3px);padding:10px 18px;border-radius:999px;border:1px solid #ead8cf;box-shadow:0 10px 22px rgba(0,0,0,.08)}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.35 ui-serif, Georgia, serif;display:flex;flex-direction:column;align-items:center;height:100vh}
+header{width:100%;background:#fffaf8;border-bottom:1px solid #eadfd9;box-shadow:0 2px 8px rgba(0,0,0,.05);padding:10px 16px;display:flex;justify-content:center;align-items:center;gap:20px;position:sticky;top:0;z-index:5}
+label{font:15px/1.2 ui-sans-serif,system-ui;color:#4a3f39}
+select,input[type=checkbox]{margin-left:6px;padding:4px 8px;border-radius:8px;border:1px solid #e3d7cf}
+.board{position:relative;width:380px;height:640px;border-radius:22px;background:linear-gradient(180deg,#f6ebe3,#fffdfa);box-shadow: inset 0 0 0 1px #ead8cf, inset 0 30px 80px rgba(190,150,120,.25), var(--shadow);overflow:hidden;margin-top:20px}
 .shelves{position:absolute;inset:72px 10px 76px 10px}
-.shelf{position:absolute;left:8px;right:8px;height:140px;border-radius:12px;background:linear-gradient(180deg, var(--wood1), var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
+.shelf{position:absolute;left:8px;right:8px;height:140px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
-.book{position:absolute;bottom:10px;height:calc(100% - 20px);width:calc((100% - 20px) * 0.66);border-radius:8px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, -0.5deg));transform-origin:bottom center;cursor:grab;user-select:none;transition:transform .15s ease, filter .2s ease}
-.book:hover{transform:translateY(-2px) rotate(var(--rot, -0.5deg));filter:brightness(1.03)}
-.book img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.book::after{content:"";position:absolute;inset:0;border-radius:8px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
-.badge{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.92);color:#3a2e2a;border:1px solid #eadfdb;font:11px/1.2 ui-sans-serif, system-ui;padding:6px 10px;border-radius:999px;box-shadow:0 6px 14px rgba(0,0,0,.10)}
-.curtain{position:absolute;top:-40px;left:-20px;right:-20px;height:120px;background:radial-gradient(100% 80% at 50% 20%, rgba(255,255,255,.9), rgba(255,240,248,.7) 60%, transparent 70%)}
-.fairy-lights{position:absolute;top:58px;left:14px;right:14px;height:22px;pointer-events:none;background:
-  radial-gradient(6px 6px at 0% 60%, rgba(255,240,180,.95), transparent 60%),
-  radial-gradient(6px 6px at 10% 40%, rgba(255,220,200,.95), transparent 60%),
-  radial-gradient(6px 6px at 20% 60%, rgba(210,240,255,.95), transparent 60%),
-  radial-gradient(6px 6px at 30% 40%, rgba(255,240,180,.95), transparent 60%),
-  radial-gradient(6px 6px at 40% 60%, rgba(210,240,255,.95), transparent 60%),
-  radial-gradient(6px 6px at 50% 40%, rgba(255,220,200,.95), transparent 60%),
-  radial-gradient(6px 6px at 60% 60%, rgba(255,240,180,.95), transparent 60%),
-  radial-gradient(6px 6px at 70% 40%, rgba(210,240,255,.95), transparent 60%),
-  radial-gradient(6px 6px at 80% 60%, rgba(255,220,200,.95), transparent 60%),
-  radial-gradient(6px 6px at 90% 40%, rgba(255,240,180,.95), transparent 60%)}
+.book{position:absolute;bottom:6px;max-height:calc(100% - 12px);border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease}
+.book:hover{filter:brightness(1.05)}
+.book img{height:100%;width:auto;object-fit:contain;border-radius:10px;display:block}
+.book::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
 .plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center;background-repeat:no-repeat}
 .plant.left{left:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
-.plant.right{right:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
-.frame-quote{position:absolute;top:112px;right:18px;width:42%;max-width:210px;padding:8px 10px;border-radius:12px;background:linear-gradient(180deg,#fff,#fff7);border:1px solid #e6d4c5;box-shadow:0 6px 16px rgba(0,0,0,.08);font:12px/1.35 Georgia,serif;color:#5a4b43}
-/* Themes */
-#board[data-theme="coquette"]{background:linear-gradient(180deg,#fff,#fff7), radial-gradient(100% 70% at 50% -10%, #ffeaf2, transparent 60%), radial-gradient(80% 40% at 90% 20%, #e8f6ff, transparent 60%), radial-gradient(80% 40% at 10% 20%, #f7ffe9, transparent 60%)}
-#board[data-theme="dark"]{background:linear-gradient(180deg,#2a2522,#3b3431); color:#f1ebe6}
-#board[data-theme="dark"] .titleplate{color:#f1ebe6;border-color:#52443b}
-#board[data-theme="dark"] .shelf{background:linear-gradient(180deg,#5f4939,#3a2a21);box-shadow:0 12px 24px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.08)}
-#board[data-theme="dark"] .badge{background:rgba(30,27,25,.8);color:#f1ebe6;border-color:#4c413a}
-#board[data-theme="cottage"]{background:linear-gradient(180deg,#f7fff5,#fffdfa), radial-gradient(100% 70% at 50% -10%, #e7ffe8, transparent 60%), radial-gradient(80% 40% at 90% 20%, #fff0f7, transparent 60%)}
+.plant.right{right:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
 </style>
 </head>
 <body>
-<header>
-  <div class="bar">
-    <h1>✨ BookTok Aesthetic Bookshelf</h1>
-  </div>
-</header>
-<main>
-  <section class="workspace">
-    <div class="board-outer">
-      <div class="board" id="board" data-theme="coquette">
-        <div class="room-bg"></div>
-        <div class="curtain"></div>
-        <div class="fairy-lights" id="fairy"></div>
-        <div class="titleplate">My BookTok Shelf</div>
-        <div id="shelves" class="shelves"></div>
-        <div class="plant left"></div>
-        <div class="plant right"></div>
-        <div class="frame-quote">“I declare after all there is no enjoyment like reading.”</div>
-        <div class="badge">#BookTok • Public Domain</div>
+  <header>
+    <label>Shelves:
+      <select id="shelfCount">
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="lights" checked> Fairy Lights</label>
+  </header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My BookTok Shelf</title>
+<style>
+:root{
+  --bg:#f6f1ee; --ink:#2c2624; --muted:#7b6d66; --pearl:#fffbf7;
+  --wood1:#b07a52; --wood2:#6f4b34; --shadow:0 16px 44px rgba(0,0,0,.10);
+}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.35 ui-serif, Georgia, serif;display:flex;justify-content:center;align-items:center;height:100vh}
+.board{position:relative;width:380px;height:640px;border-radius:22px;background:linear-gradient(180deg,#f6ebe3,#fffdfa);box-shadow: inset 0 0 0 1px #ead8cf, inset 0 30px 80px rgba(190,150,120,.25), var(--shadow);overflow:hidden}
+.shelves{position:absolute;inset:72px 10px 76px 10px}
+.shelf{position:absolute;left:8px;right:8px;height:140px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
+.shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
+.book{position:absolute;bottom:6px;max-height:calc(100% - 12px);border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease}
+.book:hover{filter:brightness(1.05)}
+.book img{height:100%;width:auto;object-fit:contain;border-radius:10px;display:block}
+.book::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
+.plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center;background-repeat:no-repeat}
+.plant.left{left:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
+.plant.right{right:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
+</style>
+</head>
+<body>
+  <div class="board">
+    <div class="shelves">
+      <div class="shelf" style="top:80px"><div class="plaque">Top Picks</div>
+        <div class="book" style="left:40px"><img src="https://covers.openlibrary.org/b/id/8231856-L.jpg" alt="Book"/></div>
+        <div class="book" style="left:130px"><img src="https://covers.openlibrary.org/b/id/7222246-L.jpg" alt="Book"/></div>
+      </div>
+      <div class="shelf" style="top:240px"><div class="plaque">TBR</div>
+        <div class="book" style="left:70px"><img src="https://covers.openlibrary.org/b/id/8486190-L.jpg" alt="Book"/></div>
+        <div class="book" style="left:170px"><img src="https://covers.openlibrary.org/b/id/10909255-L.jpg" alt="Book"/></div>
+      </div>
+      <div class="shelf" style="top:400px"><div class="plaque">Classics</div>
+        <div class="book" style="left:100px"><img src="https://covers.openlibrary.org/b/id/9872927-L.jpg" alt="Book"/></div>
+        <div class="book" style="left:200px"><img src="https://covers.openlibrary.org/b/id/8262163-L.jpg" alt="Book"/></div>
       </div>
     </div>
-  </section>
-</main>
+    <div class="plant left"></div>
+    <div class="plant right"></div>
+  </div>
+  <script>
+  document.querySelectorAll('.book').forEach(book => {
+    book.addEventListener('dblclick', () => {
+      const currentRot = parseFloat(book.style.getPropertyValue('--rot')) || 0;
+      const newRot = currentRot === 0 ? (Math.random() < 0.5 ? 20 : -20) : 0;
+      book.style.setProperty('--rot', `${newRot}deg`);
+      book.style.transform = `rotate(${newRot}deg)`;
+    });
+  });
+  </script>
 </body>
 </html>
 
