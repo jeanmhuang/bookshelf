@@ -49,9 +49,9 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   radial-gradient(80% 40% at 10% 20%, rgba(217,245,230,.35), transparent 60%),
   radial-gradient(80% 40% at 90% 20%, rgba(255,223,237,.35), transparent 60%)}
 .titleplate{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-weight:700;color:#3a2e2a;background:linear-gradient(180deg,#fff8,#fff0);backdrop-filter: blur(3px);padding:10px 18px;border-radius:999px;border:1px solid #ead8cf;box-shadow:0 10px 22px rgba(0,0,0,.08)}
-.shelves{position:absolute;inset:80px 12px 86px 12px}
-.shelf{position:absolute;left:8px;right:8px;height:110px;border-radius:10px;background:linear-gradient(180deg, var(--wood1), var(--wood2));box-shadow:0 10px 22px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.25)}
-.shelf .plaque{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);padding:2px 10px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
+.shelves{position:absolute;inset:72px 10px 76px 10px}
+.shelf{position:absolute;left:8px;right:8px;height:140px;border-radius:12px;background:linear-gradient(180deg, var(--wood1), var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
+.shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
 .book{position:absolute;bottom:10px;width:62px;height:86px;border-radius:6px;box-shadow:0 10px 18px rgba(0,0,0,.30);transform:rotate(var(--rot, -0.5deg));transform-origin:bottom center;cursor:grab;user-select:none;transition:transform .15s ease, filter .2s ease}
 .book:hover{transform:translateY(-2px) rotate(var(--rot, -0.5deg));filter:brightness(1.03)}
 .book img{width:100%;height:100%;object-fit:cover;border-radius:6px}
@@ -69,9 +69,9 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   radial-gradient(6px 6px at 70% 40%, rgba(210,240,255,.95), transparent 60%),
   radial-gradient(6px 6px at 80% 60%, rgba(255,220,200,.95), transparent 60%),
   radial-gradient(6px 6px at 90% 40%, rgba(255,240,180,.95), transparent 60%)}
-.plant{position:absolute;bottom:10px;width:86px;height:86px;background:radial-gradient(80% 80% at 50% 60%, #6bbf86, #3b7a4d);border-radius:16px 16px 10px 10px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
-.plant.left{left:10px}
-.plant.right{right:10px}
+.plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:cover;background-position:center}
+.plant.left{left:12px;background-image:url('https://images.unsplash.com/photo-1523575708161-ad0fc2a9b951?auto=format&fit=crop&w=256&q=80')}
+.plant.right{right:12px;background-image:url('https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=256&q=80')}
 .frame-quote{position:absolute;top:112px;right:18px;width:42%;max-width:210px;padding:8px 10px;border-radius:12px;background:linear-gradient(180deg,#fff,#fff7);border:1px solid #e6d4c5;box-shadow:0 6px 16px rgba(0,0,0,.08);font:12px/1.35 Georgia,serif;color:#5a4b43}
 /* Themes */
 #board[data-theme="coquette"]{background:linear-gradient(180deg,#fff,#fff7), radial-gradient(100% 70% at 50% -10%, #ffeaf2, transparent 60%), radial-gradient(80% 40% at 90% 20%, #e8f6ff, transparent 60%), radial-gradient(80% 40% at 10% 20%, #f7ffe9, transparent 60%)}
@@ -183,10 +183,21 @@ function renderShelves(count=3){
   shelvesEl.innerHTML='';
   const labels = count===2? ['Favorites','Classics'] : ['Top Picks','TBR','Classics'];
   const rect = board.getBoundingClientRect();
-  const topPad=110, bottomPad=110, shelfH=110; const avail=(rect.height||640)-topPad-bottomPad; const gap=count>1 ? (avail-count*shelfH)/(count-1) : 0;
+  const topPad=84, bottomPad=88; // tighter padding
+  const avail = (rect.height||640) - topPad - bottomPad;
+  const minGap = 8; // minimal whitespace between shelves
+  const shelfH = Math.floor((avail - minGap*(count-1)) / count);
+  const gap = minGap;
   for(let i=0;i<count;i++){
-    const shelf=document.createElement('div'); shelf.className='shelf'; shelf.style.top=(topPad+i*(shelfH+gap))+'px';
+    const shelf=document.createElement('div');
+    shelf.className='shelf';
+    shelf.style.top = (topPad + i*(shelfH+gap)) + 'px';
+    shelf.style.height = shelfH + 'px';
     const plaque=document.createElement('div'); plaque.className='plaque'; plaque.textContent=labels[i]||`Shelf ${i+1}`; shelf.appendChild(plaque);
+    shelvesEl.appendChild(shelf);
+  }
+  bindShelfDnD();
+}`; shelf.appendChild(plaque);
     shelvesEl.appendChild(shelf);
   }
   bindShelfDnD();
