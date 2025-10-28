@@ -52,10 +52,10 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .shelves{position:absolute;inset:72px 10px 76px 10px}
 .shelf{position:absolute;left:8px;right:8px;height:140px;border-radius:12px;background:linear-gradient(180deg, var(--wood1), var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
-.book{position:absolute;bottom:10px;width:62px;height:86px;border-radius:6px;box-shadow:0 10px 18px rgba(0,0,0,.30);transform:rotate(var(--rot, -0.5deg));transform-origin:bottom center;cursor:grab;user-select:none;transition:transform .15s ease, filter .2s ease}
+.book{position:absolute;bottom:10px;height:calc(100% - 20px);width:calc((100% - 20px) * 0.66);border-radius:8px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, -0.5deg));transform-origin:bottom center;cursor:grab;user-select:none;transition:transform .15s ease, filter .2s ease}
 .book:hover{transform:translateY(-2px) rotate(var(--rot, -0.5deg));filter:brightness(1.03)}
-.book img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-.book::after{content:"";position:absolute;inset:0;border-radius:6px;background:linear-gradient(90deg, rgba(0,0,0,.18), transparent 18%, transparent 82%, rgba(255,255,255,.25));mix-blend-mode:soft-light;pointer-events:none}
+.book img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.book::after{content:"";position:absolute;inset:0;border-radius:8px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
 .badge{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.92);color:#3a2e2a;border:1px solid #eadfdb;font:11px/1.2 ui-sans-serif, system-ui;padding:6px 10px;border-radius:999px;box-shadow:0 6px 14px rgba(0,0,0,.10)}
 .curtain{position:absolute;top:-40px;left:-20px;right:-20px;height:120px;background:radial-gradient(100% 80% at 50% 20%, rgba(255,255,255,.9), rgba(255,240,248,.7) 60%, transparent 70%)}
 .fairy-lights{position:absolute;top:58px;left:14px;right:14px;height:22px;pointer-events:none;background:
@@ -69,9 +69,9 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   radial-gradient(6px 6px at 70% 40%, rgba(210,240,255,.95), transparent 60%),
   radial-gradient(6px 6px at 80% 60%, rgba(255,220,200,.95), transparent 60%),
   radial-gradient(6px 6px at 90% 40%, rgba(255,240,180,.95), transparent 60%)}
-.plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:cover;background-position:center}
-.plant.left{left:12px;background-image:url('https://images.unsplash.com/photo-1523575708161-ad0fc2a9b951?auto=format&fit=crop&w=256&q=80')}
-.plant.right{right:12px;background-image:url('https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=256&q=80')}
+.plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center;background-repeat:no-repeat}
+.plant.left{left:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
+.plant.right{right:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
 .frame-quote{position:absolute;top:112px;right:18px;width:42%;max-width:210px;padding:8px 10px;border-radius:12px;background:linear-gradient(180deg,#fff,#fff7);border:1px solid #e6d4c5;box-shadow:0 6px 16px rgba(0,0,0,.08);font:12px/1.35 Georgia,serif;color:#5a4b43}
 /* Themes */
 #board[data-theme="coquette"]{background:linear-gradient(180deg,#fff,#fff7), radial-gradient(100% 70% at 50% -10%, #ffeaf2, transparent 60%), radial-gradient(80% 40% at 90% 20%, #e8f6ff, transparent 60%), radial-gradient(80% 40% at 10% 20%, #f7ffe9, transparent 60%)}
@@ -86,47 +86,10 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 <header>
   <div class="bar">
     <h1>✨ BookTok Aesthetic Bookshelf</h1>
-    <div class="pill" style="max-width:560px">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.3-4.3" stroke="#7b6d66" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#7b6d66" stroke-width="1.6" fill="none"/></svg>
-      <input id="q" placeholder="Search public-domain classics (e.g., pride and prejudice)"/>
-      <button class="btn alt" id="go">Search</button>
-    </div>
-    <button class="btn" id="export">Export PNG</button>
   </div>
 </header>
 <main>
-  <section class="panel" aria-label="Search and picks">
-    <h2>Discover Classics</h2>
-    <div class="content">
-      <div class="chips" id="chips"></div>
-      <div class="results" id="results" aria-live="polite"></div>
-    </div>
-  </section>
   <section class="workspace">
-    <div class="canvas-wrap">
-      <div class="toolbar">
-        <button class="btn ghost" id="clear">Clear shelf</button>
-        <button class="btn ghost" id="save">Save</button>
-        <button class="btn ghost" id="load">Load</button>
-        <div class="spacer"></div>
-        <label class="note" style="display:flex;align-items:center;gap:6px">Theme:
-          <select id="theme" style="border:1px solid #e3d7cf;border-radius:10px;padding:6px 10px;background:#fff"> 
-            <option value="coquette">Coquette</option>
-            <option value="dark">Dark Academia</option>
-            <option value="cottage">Cottagecore</option>
-          </select>
-        </label>
-        <label class="note" style="display:flex;align-items:center;gap:6px;margin-left:8px">
-          <input type="checkbox" id="lights" checked /> Fairy lights
-        </label>
-        <label class="note" style="display:flex;align-items:center;gap:6px;margin-left:8px">Shelves:
-          <select id="shelfCount" style="border:1px solid #e3d7cf;border-radius:10px;padding:6px 10px;background:#fff">
-            <option value="2">2</option>
-            <option value="3" selected>3</option>
-          </select>
-        </label>
-      </div>
-    </div>
     <div class="board-outer">
       <div class="board" id="board" data-theme="coquette">
         <div class="room-bg"></div>
@@ -142,102 +105,6 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
     </div>
   </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script>
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const resultsEl = $('#results');
-const chipsEl = $('#chips');
-const board = $('#board');
-const themeSel = $('#theme');
-const fairy = $('#fairy');
-const lightsToggle = $('#lights');
-const shelvesEl = $('#shelves');
-const shelfCountSel = $('#shelfCount');
-
-const presetQueries = ['pride and prejudice','jane eyre','wuthering heights','dracula','frankenstein','the picture of dorian gray','the count of monte cristo','les miserables','little women','the secret garden','emma jane austen','a tale of two cities'];
-function renderChips(){ chipsEl.innerHTML=''; presetQueries.forEach(q=>{ const b=document.createElement('button'); b.className='chip'; b.textContent=q; b.onclick=()=>doSearch(q); chipsEl.appendChild(b); }); }
-
-async function doSearch(query){
-  $('#q').value = query;
-  resultsEl.innerHTML = '<div class="note" style="grid-column:1/-1">Searching…</div>';
-  try{
-    const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=18`);
-    const data = await res.json();
-    const docs = data.docs || [];
-    if(!docs.length){ resultsEl.innerHTML = '<div class="note" style="grid-column:1/-1">No results. Try another classic.</div>'; return; }
-    resultsEl.innerHTML='';
-    docs.forEach(d=>{
-      const card=document.createElement('div'); card.className='book-card'; card.draggable=true;
-      const title=d.title||'Untitled'; const author=(d.author_name&&d.author_name[0])||''; const coverId=d.cover_i; const src=coverId?`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`:'';
-      card.dataset.title=title; card.dataset.author=author; card.dataset.src=src;
-      card.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain', JSON.stringify({title,author,src})); });
-      if(src){ const im=new Image(); im.src=src; im.alt=`${title} — ${author}`; im.loading='lazy'; card.appendChild(im);} else { card.innerHTML=`<div class='ttl'>${title}</div>`; }
-      const ttl=document.createElement('div'); ttl.className='ttl'; ttl.textContent=`${title}${author?' — '+author:''}`; card.appendChild(ttl);
-      resultsEl.appendChild(card);
-    });
-  }catch{ resultsEl.innerHTML = '<div class="note" style="grid-column:1/-1">Search error. Try again.</div>'; }
-}
-
-function renderShelves(count=3){
-  shelvesEl.innerHTML='';
-  const labels = count===2? ['Favorites','Classics'] : ['Top Picks','TBR','Classics'];
-  const rect = board.getBoundingClientRect();
-  const topPad=84, bottomPad=88; // tighter padding
-  const avail = (rect.height||640) - topPad - bottomPad;
-  const minGap = 8; // minimal whitespace between shelves
-  const shelfH = Math.floor((avail - minGap*(count-1)) / count);
-  const gap = minGap;
-  for(let i=0;i<count;i++){
-    const shelf=document.createElement('div');
-    shelf.className='shelf';
-    shelf.style.top = (topPad + i*(shelfH+gap)) + 'px';
-    shelf.style.height = shelfH + 'px';
-    const plaque=document.createElement('div');
-    plaque.className='plaque';
-    plaque.textContent=labels[i]||`Shelf ${i+1}`;
-    shelf.appendChild(plaque);
-    shelvesEl.appendChild(shelf);
-  }
-  bindShelfDnD();
-}
-
-function bindShelfDnD(){
-  $$('.shelf').forEach(shelf=>{
-    shelf.addEventListener('dragover',e=>e.preventDefault());
-    shelf.addEventListener('drop',e=>{ e.preventDefault(); try{ const data=JSON.parse(e.dataTransfer.getData('text/plain')); const rect=shelf.getBoundingClientRect(); const x=e.clientX-rect.left; placeBookOnShelf(shelf,data,x); persist(); }catch(err){ console.warn(err); } });
-  });
-}
-
-function rand(a,b){ return a+Math.random()*(b-a); }
-function placeBookOnShelf(shelf,{title,author,src},x){
-  const el=document.createElement('div'); el.className='book'; el.style.left=Math.max(6, Math.min((shelf.clientWidth-70), (x||40)-30))+'px'; el.style.setProperty('--rot',(Math.random()<.5?-1:1)*rand(0,1.2)+'deg'); el.dataset.title=title; el.dataset.author=author; el.dataset.src=src||'';
-  const img=new Image(); img.src=src||placeholderCover(title,author); img.alt=`${title} — ${author}`; el.appendChild(img);
-  el.addEventListener('click',()=>{ const cur=parseFloat((getComputedStyle(el).getPropertyValue('--rot')||'0deg').replace('deg','')); const next=Math.abs(cur)<0.2?rand(-1.5,1.5):-cur*0.9; el.style.setProperty('--rot', next+'deg'); });
-  let t; el.addEventListener('pointerdown',()=>{ t=setTimeout(()=>{ el.remove(); persist(); },600)}); ['pointerup','pointerleave'].forEach(v=>el.addEventListener(v,()=>clearTimeout(t)));
-  shelf.appendChild(el);
-}
-function placeholderCover(title,author){ const t=(title||'Untitled').slice(0,36).replace(/&/g,'&amp;'); const a=(author||'').slice(0,28).replace(/&/g,'&amp;'); const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='550'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#d8ecff'/><stop offset='100%' stop-color='#ffe1ea'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.4)' stroke='rgba(0,0,0,.06)'/><text x='36' y='280' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text><text x='36' y='318' font-family='Georgia,serif' font-size='16' fill='#5a5552'>${a}</text></svg>`; return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg); }
-
-$('#export').addEventListener('click', async ()=>{ const canvas=await html2canvas(board,{scale:2,backgroundColor:null}); const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='my-booktok-shelf.png'; a.click(); });
-$('#clear').addEventListener('click',()=>{ $$('.book').forEach(b=>b.remove()); persist(); });
-$('#save').addEventListener('click',()=>{ persist(); alert('Shelf saved!'); });
-$('#load').addEventListener('click',()=> restore());
-function persist(){ const all=[]; $$('.shelf').forEach((s,idx)=>{ s.querySelectorAll('.book').forEach(b=>{ all.push({shelf:idx,left:parseFloat(b.style.left),rot:getComputedStyle(b).getPropertyValue('--rot'),title:b.dataset.title,author:b.dataset.author,src:b.dataset.src}) }); }); localStorage.setItem('booktok-shelf', JSON.stringify(all)); }
-function restore(){ $$('.book').forEach(b=>b.remove()); const all=JSON.parse(localStorage.getItem('booktok-shelf')||'[]'); const shelves=$$('.shelf'); all.forEach(it=>{ const shelf=shelves[it.shelf]||shelves[0]; placeBookOnShelf(shelf,it,(it.left||20)+30); const last=shelf.lastElementChild; if(last) last.style.setProperty('--rot', it.rot||'-0.5deg'); }); }
-$('#go').addEventListener('click',()=>doSearch($('#q').value||'pride and prejudice'));
-$('#q').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#go').click(); });
-
-renderChips();
-const storedCount=parseInt(localStorage.getItem('booktok-shelf-count')||'3',10); renderShelves([2,3].includes(storedCount)?storedCount:3);
-if(shelfCountSel){ shelfCountSel.value=String([2,3].includes(storedCount)?storedCount:3); shelfCountSel.addEventListener('change',()=>{ const c=parseInt(shelfCountSel.value,10); localStorage.setItem('booktok-shelf-count', String(c)); renderShelves(c); restore(); }); }
-restore();
-if(localStorage.getItem('booktok-theme')){ board.dataset.theme=localStorage.getItem('booktok-theme'); themeSel.value=board.dataset.theme; }
-themeSel.addEventListener('change',()=>{ const v=themeSel.value; board.dataset.theme=v; localStorage.setItem('booktok-theme', v); });
-lightsToggle.addEventListener('change',()=>{ fairy.style.display = lightsToggle.checked? '':'none'; });
-// Default search
-doSearch('pride and prejudice');
-</script>
 </body>
 </html>
 
