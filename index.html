@@ -94,7 +94,7 @@ main{max-width:1400px;margin:16px auto;padding:0 16px;display:grid;grid-template
   transition:background .25s ease;
 }
 @media (min-width:1200px){
-  .board{ width:820px; height:900px; } /* larger but not as wide as previous widest */
+  .board{ width:820px; height:900px; } /* larger but not the previous widest */
 }
 .board::before,.board::after{content:"";position:absolute;top:0;bottom:0;width:12px;background:linear-gradient(180deg,#ccb19a,#b69074);box-shadow:inset 0 1px 0 #fff6}
 .board::before{left:0;border-radius:22px 0 0 22px}
@@ -106,7 +106,6 @@ main{max-width:1400px;margin:16px auto;padding:0 16px;display:grid;grid-template
   display:flex;justify-content:space-between;align-items:center;z-index:6;pointer-events:none
 }
 .fairy::before{
-  /* a subtle wire for the bulbs to sit on */
   content:""; position:absolute; left:0; right:0; top:15px; height:2px; background:var(--wire); opacity:.55;
 }
 .fairy.hidden{visibility:hidden}
@@ -424,10 +423,7 @@ function enforceSpacing(shelf){
   arr.forEach(it => it.el.style.left = Math.round(it.left) + 'px');
 }
 
-/* ========= Discover: multiple vintage covers per search =========
-   Strategy: Use Open Library Search with edition_key to display different cover jackets.
-   We prefer OLID covers: https://covers.openlibrary.org/b/olid/OLID-L.jpg
-*/
+/* ========= Discover: create cards ========= */
 function makeCard({src}){
   const card = document.createElement('div');
   card.className = 'book-card';
@@ -445,71 +441,139 @@ function makeCard({src}){
   return card;
 }
 
-async function searchBooks(q){
-  resultsEl.innerHTML = '';
-  if(!q || !q.trim()){ return featuredCovers(); }
-  try{
-    const url = `https://openlibrary.org/search.json?title=${encodeURIComponent(q)}&language=eng&limit=40&has_fulltext=true&public_scan_b=true&fields=title,edition_key,cover_i`;
+/* ========= Editions-based cover fetching ========= */
+async function fetchEditionCovers(workKey, max = 40) {
+  const images = [];
+  let offset = 0;
+  const pageSize = 100;
+  while (images.length < max) {
+    const url = `https://openlibrary.org${workKey}/editions.json?limit=${pageSize}&offset=${offset}`;
     const res = await fetch(url);
+    if (!res.ok) break;
     const data = await res.json();
-    const docs = Array.isArray(data.docs) ? data.docs : [];
-    const images = [];
+    const entries = Array.isArray(data.entries) ? data.entries : [];
+    if (!entries.length) break;
 
-    // collect many different edition covers
-    for(const d of docs){
-      if(Array.isArray(d.edition_key)){
-        for(const olid of d.edition_key){
-          images.push(`https://covers.openlibrary.org/b/olid/${olid}-L.jpg`);
-          if(images.length>=36) break;
-        }
-      } else if (d.cover_i){
-        images.push(`https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`);
+    for (const ed of entries) {
+      if (Array.isArray(ed.covers) && ed.covers.length) {
+        ed.covers.forEach(id => images.push(`https://covers.openlibrary.org/b/id/${id}-L.jpg`));
+      } else if (ed.cover_id) {
+        images.push(`https://covers.openlibrary.org/b/id/${ed.cover_id}-L.jpg`);
+      } else if (ed.key) {
+        const olid = ed.key.split('/').pop();
+        images.push(`https://covers.openlibrary.org/b/olid/${olid}-L.jpg`);
       }
-      if(images.length>=36) break;
+      if (images.length >= max) break;
     }
 
-    if(!images.length){
-      resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No vintage jackets found. Try another title or author?</div>`;
+    if (!data.links || !data.links.next) break;
+    offset += pageSize;
+  }
+
+  const seen = new Set();
+  return images.filter(u => (seen.has(u) ? false : (seen.add(u), true)));
+}
+
+/* ========= Search: many vintage jackets for one title ========= */
+async function searchBooks(q) {
+  resultsEl.innerHTML = '';
+  if (!q || !q.trim()) { return featuredCovers(); }
+
+  try {
+    // find a good work match
+    const workSearchUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=10`;
+    const sres = await fetch(workSearchUrl);
+    const sdata = await sres.json();
+    const docs = Array.isArray(sdata.docs) ? sdata.docs : [];
+
+    const withWork = docs.find(d =>
+      (Array.isArray(d.key) ? d.key.some(k => k.startsWith('/works/')) :
+       (typeof d.key === 'string' && d.key.startsWith('/works/')))
+    );
+    let workKey = null;
+
+    if (withWork) {
+      workKey = Array.isArray(withWork.key)
+        ? (withWork.key.find(k => k.startsWith('/works/')) || withWork.key[0])
+        : withWork.key;
+    } else if (docs[0]?.key?.startsWith?.('/works/')) {
+      workKey = docs[0].key;
+    } else if (docs[0]?.work_key?.[0]) {
+      workKey = docs[0].work_key[0];
+    }
+
+    let images = [];
+    if (workKey) {
+      images = await fetchEditionCovers(workKey, 48);
+    } else {
+      // fallback: per-doc covers/olids
+      for (const d of docs) {
+        if (Array.isArray(d.edition_key)) {
+          for (const olid of d.edition_key) {
+            images.push(`https://covers.openlibrary.org/b/olid/${olid}-L.jpg`);
+            if (images.length >= 36) break;
+          }
+        } else if (d.cover_i) {
+          images.push(`https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`);
+        }
+        if (images.length >= 36) break;
+      }
+      const seen = new Set();
+      images = images.filter(u => (seen.has(u) ? false : (seen.add(u), true)));
+    }
+
+    if (!images.length) {
+      resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No vintage jackets found. Try another title or spelling.</div>`;
       return;
     }
 
     const frag = document.createDocumentFragment();
     images.forEach(src => frag.appendChild(makeCard({src})));
     resultsEl.appendChild(frag);
-  }catch(err){
+  } catch (err) {
     console.error(err);
     resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">Search error. Please try again.</div>`;
   }
 }
 
-/* Featured: pre-populate with a few beloved classics (pulling edition covers) */
-async function featuredCovers(){
+/* ========= Featured: pick works, then show editions ========= */
+async function featuredCovers() {
   resultsEl.innerHTML = '';
-  const picks = ['Pride and Prejudice','Jane Eyre','Little Women'];
+  const seeds = ['Pride and Prejudice','Jane Eyre','Little Women'];
   const images = [];
-  for(const t of picks){
-    try{
-      const url = `https://openlibrary.org/search.json?title=${encodeURIComponent(t)}&language=eng&limit=15&has_fulltext=true&public_scan_b=true&fields=edition_key,cover_i`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const docs = Array.isArray(data.docs) ? data.docs : [];
-      for(const d of docs){
-        if(Array.isArray(d.edition_key)){
-          d.edition_key.forEach(olid => images.push(`https://covers.openlibrary.org/b/olid/${olid}-L.jpg`));
-        }else if(d.cover_i){
-          images.push(`https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`);
-        }
-        if(images.length>=30) break;
+
+  for (const title of seeds) {
+    try {
+      const u = `https://openlibrary.org/search.json?q=${encodeURIComponent(title)}&limit=5`;
+      const r = await fetch(u);
+      const d = await r.json();
+      const docs = Array.isArray(d.docs) ? d.docs : [];
+      const wdoc = docs.find(x =>
+        (Array.isArray(x.key) ? x.key.some(k => k.startsWith('/works/')) :
+         (typeof x.key === 'string' && x.key.startsWith('/works/')))
+      ) || docs[0];
+
+      let workKey = null;
+      if (wdoc) {
+        workKey = Array.isArray(wdoc.key)
+          ? (wdoc.key.find(k => k.startsWith('/works/')) || wdoc.key[0])
+          : wdoc.key;
       }
-      if(images.length>=30) break;
-    }catch(_){}
+      if (workKey) {
+        const imgs = await fetchEditionCovers(workKey, 18);
+        images.push(...imgs);
+      }
+      if (images.length >= 36) break;
+    } catch (_) {}
   }
-  if(!images.length){
-    resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No featured covers available right now. Try searching above.</div>`;
+
+  const dedup = Array.from(new Set(images)).slice(0, 36);
+  if (!dedup.length) {
+    resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No featured covers right now. Try a search above.</div>`;
     return;
   }
   const frag = document.createDocumentFragment();
-  images.slice(0,30).forEach(src => frag.appendChild(makeCard({src})));
+  dedup.forEach(src => frag.appendChild(makeCard({src})));
   resultsEl.appendChild(frag);
 }
 
