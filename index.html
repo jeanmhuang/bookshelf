@@ -43,21 +43,29 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .board::before{left:0;border-radius:22px 0 0 22px}
 .board::after{right:0;border-radius:0 22px 22px 0}
 
-/* Fairy lights */
-.fairy{position:absolute;top:56px;left:18px;right:18px;height:22px;pointer-events:none;background:
-  radial-gradient(6px 6px at 0% 60%, rgba(255,240,180,.95), transparent 60%),
-  radial-gradient(6px 6px at 10% 40%, rgba(255,220,200,.95), transparent 60%),
-  radial-gradient(6px 6px at 20% 60%, rgba(210,240,255,.95), transparent 60%),
-  radial-gradient(6px 6px at 30% 40%, rgba(255,240,180,.95), transparent 60%),
-  radial-gradient(6px 6px at 40% 60%, rgba(210,240,255,.95), transparent 60%),
-  radial-gradient(6px 6px at 50% 40%, rgba(255,220,200,.95), transparent 60%),
-  radial-gradient(6px 6px at 60% 60%, rgba(255,240,180,.95), transparent 60%),
-  radial-gradient(6px 6px at 70% 40%, rgba(210,240,255,.95), transparent 60%),
-  radial-gradient(6px 6px at 80% 60%, rgba(255,220,200,.95), transparent 60%),
-  radial-gradient(6px 6px at 90% 40%, rgba(255,240,180,.95), transparent 60%)}
+/* Fairy lights (visible above shelves, with twinkle) */
+.fairy{position:absolute;top:56px;left:18px;right:18px;height:26px;pointer-events:none;z-index:2;
+  background:
+    radial-gradient(7px 7px at 4% 55%,  rgba(255,240,180,.95), transparent 60%),
+    radial-gradient(7px 7px at 13% 45%, rgba(255,220,200,.95), transparent 60%),
+    radial-gradient(7px 7px at 22% 55%, rgba(210,240,255,.95), transparent 60%),
+    radial-gradient(7px 7px at 31% 45%, rgba(255,240,180,.95), transparent 60%),
+    radial-gradient(7px 7px at 40% 55%, rgba(210,240,255,.95), transparent 60%),
+    radial-gradient(7px 7px at 49% 45%, rgba(255,220,200,.95), transparent 60%),
+    radial-gradient(7px 7px at 58% 55%, rgba(255,240,180,.95), transparent 60%),
+    radial-gradient(7px 7px at 67% 45%, rgba(210,240,255,.95), transparent 60%),
+    radial-gradient(7px 7px at 76% 55%, rgba(255,220,200,.95), transparent 60%),
+    radial-gradient(7px 7px at 85% 45%, rgba(255,240,180,.95), transparent 60%),
+    radial-gradient(7px 7px at 94% 55%, rgba(210,240,255,.95), transparent 60%);
+  animation: twinkle 2.4s infinite ease-in-out alternate;
+}
+@keyframes twinkle{
+  0% { opacity:.7; filter:drop-shadow(0 0 2px rgba(255,243,200,.7)); }
+  100%{ opacity:1; filter:drop-shadow(0 0 6px rgba(255,243,200,1)); }
+}
 .fairy.hidden{display:none;}
 
-.shelves{position:absolute;inset:72px 10px 76px 10px}
+.shelves{position:absolute;inset:72px 10px 76px 10px; z-index:1;}
 .shelf{position:absolute;left:8px;right:8px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
 
@@ -72,9 +80,10 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .remove-btn{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:999px;background:#fff;border:1px solid #e1c9c0;box-shadow:0 4px 10px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font:700 16px/1 ui-sans-serif,system-ui;color:#7a4a3a;opacity:0;transition:opacity .15s ease;cursor:pointer}
 .book:hover .remove-btn{opacity:1}
 
-.plant{position:absolute;bottom:12px;width:96px;height:96px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center;background-repeat:no-repeat}
-.plant.left{left:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
-.plant.right{right:12px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
+/* Bigger plants */
+.plant{position:absolute;bottom:10px;width:140px;height:140px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center bottom;background-repeat:no-repeat}
+.plant.left{left:8px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
+.plant.right{right:8px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
 </style>
 </head>
 <body>
@@ -93,7 +102,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   </div>
   <div class="instructions">
     <strong>How it works:</strong>
-    Search a classic below, drag a cover onto a shelf, and double-click a book to tilt it <strong>10°</strong> left or right.<br/>
+    Search a classic below (or pick one of the pre-populated options), drag a cover onto a shelf, and double-click a book to tilt it <strong>10°</strong> left or right.<br/>
     <strong>Remove a book:</strong> hover a book and click the <strong>✕</strong>, or click a book (it highlights) and press <strong>Delete</strong>/<strong>Backspace</strong>.<br/>
     Use the menu to change shelf count or toggle the fairy lights.
   </div>
@@ -136,6 +145,22 @@ const lightsToggle  = $('#lights');
 const fairy         = $('#fairy');
 
 let selectedBook = null;
+
+/* ------- Curated picks for pre-populated grid ------- */
+const curated = [
+  {title:'Pride and Prejudice', author:'Jane Austen', cover_i:8231856},
+  {title:'Little Women', author:'Louisa May Alcott', cover_i:10523369},
+  {title:'Jane Eyre', author:'Charlotte Brontë', cover_i:10509349},
+  {title:'Wuthering Heights', author:'Emily Brontë', cover_i:8231561},
+  {title:'The Picture of Dorian Gray', author:'Oscar Wilde', cover_i:8231996},
+  {title:'Anna Karenina', author:'Leo Tolstoy', cover_i:10706347},
+  {title:'Emma', author:'Jane Austen', cover_i:10923255},
+  {title:'Sense and Sensibility', author:'Jane Austen', cover_i:8232100},
+  {title:'The Secret Garden', author:'Frances Hodgson Burnett', cover_i:8782474},
+  {title:'A Little Princess', author:'Frances Hodgson Burnett', cover_i:8231186},
+  {title:'Persuasion', author:'Jane Austen', cover_i:10526035},
+  {title:'The Scarlet Pimpernel', author:'Baroness Orczy', cover_i:8231721},
+];
 
 /* ------- Shelves ------- */
 function renderShelves(count=3){
@@ -260,7 +285,7 @@ function placeholderCover(title,author){
 /* ------- Search (Open Library) ------- */
 async function searchBooks(q){
   resultsEl.innerHTML = '';
-  if(!q || !q.trim()) return;
+  if(!q || !q.trim()){ renderCurated(); return; }
 
   const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&has_fulltext=true&language=eng&limit=24`;
   try{
@@ -288,7 +313,7 @@ function makeCard(d){
   card.className = 'book-card';
 
   const title  = d.title || 'Untitled';
-  const author = (d.author_name && d.author_name[0]) || '';
+  const author = (d.author_name && d.author_name[0]) || d.author || '';
   const coverId = d.cover_i;
   const src = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : '';
 
@@ -310,6 +335,13 @@ function makeCard(d){
   return card;
 }
 
+function renderCurated(){
+  resultsEl.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  curated.forEach(d => frag.appendChild(makeCard(d)));
+  resultsEl.appendChild(frag);
+}
+
 /* ------- UI bindings ------- */
 $('#go').addEventListener('click', ()=> searchBooks($('#q').value));
 $('#q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ searchBooks($('#q').value); } });
@@ -319,7 +351,7 @@ shelfCountSel.addEventListener('change', ()=>{
   renderShelves(n);
 });
 
-// Reliable fairy-lights toggle via class
+// Solid fairy-lights toggle via class; ensure visible by default
 lightsToggle.addEventListener('change', ()=>{
   fairy.classList.toggle('hidden', !lightsToggle.checked);
 });
@@ -343,9 +375,10 @@ document.addEventListener('click', (e)=>{
 
 /* ------- Init ------- */
 renderShelves(parseInt(shelfCountSel.value,10)||3);
-lightsToggle.dispatchEvent(new Event('change'));
+renderCurated();
+lightsToggle.checked = true;          // ensure default ON
+fairy.classList.remove('hidden');     // ensure visible at start
 </script>
 </body>
 </html>
-
 
