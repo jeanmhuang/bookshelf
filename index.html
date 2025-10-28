@@ -193,7 +193,10 @@ function renderShelves(count=3){
     shelf.className='shelf';
     shelf.style.top = (topPad + i*(shelfH+gap)) + 'px';
     shelf.style.height = shelfH + 'px';
-    const plaque=document.createElement('div'); plaque.className='plaque'; plaque.textContent=labels[i]||`Shelf ${i+1}`; shelf.appendChild(plaque);
+    const plaque=document.createElement('div');
+    plaque.className='plaque';
+    plaque.textContent=labels[i]||`Shelf ${i+1}`;
+    shelf.appendChild(plaque);
     shelvesEl.appendChild(shelf);
   }
   bindShelfDnD();
@@ -241,5 +244,6 @@ doSearch('pride and prejudice');
 </script>
 </body>
 </html>
+
 
 
