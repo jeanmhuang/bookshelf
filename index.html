@@ -4,38 +4,49 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>My BookTok Shelf</title>
-<meta name="description" content="Search public-domain classics, drag covers onto a cozy vertical bookshelf, tweak shelves and fairy lights, tilt books with a double-click, and remove books easily." />
+<meta name="description" content="Drag beautiful classics onto a cozy bookshelf, tilt books, toggle fairy lights, space books neatly, clear shelves, and export as PNG." />
 <link rel="preconnect" href="https://openlibrary.org">
 <link rel="preconnect" href="https://covers.openlibrary.org">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 <style>
-:root{ --bg:#f6f1ee; --ink:#2c2624; --muted:#7b6d66; --pearl:#fffbf7; --wood1:#b07a52; --wood2:#6f4b34; --shadow:0 16px 44px rgba(0,0,0,.10); }
+:root{
+  --bg:#f6f1ee; --ink:#2c2624; --muted:#7b6d66; --pearl:#fffbf7;
+  --wood1:#b07a52; --wood2:#6f4b34; --shadow:0 16px 44px rgba(0,0,0,.10);
+  --gutter:10px; --book-pad:6px;
+}
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.35 ui-serif, Georgia, serif}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#fefefe 60%);color:var(--ink);font:16px/1.4 ui-serif,Georgia,serif}
 
 /* Header */
-header{position:sticky;top:0;z-index:10;background:#fffaf8;border-bottom:1px solid #eadfd9;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.bar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
+header{position:sticky;top:0;z-index:20;background:#fffaf8;border-bottom:1px solid #eadfd9;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.bar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
 label{font:15px/1.2 ui-sans-serif,system-ui;color:#4a3f39;display:flex;align-items:center;gap:8px}
 select,input[type=checkbox]{padding:6px 10px;border-radius:10px;border:1px solid #e3d7cf;background:#fff}
-.instructions{font:14px/1.5 ui-sans-serif,system-ui;color:#5b4e47;margin:6px auto 10px;text-align:center;max-width:1000px}
+.btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:#222;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.12)}
+.btn.ghost{background:#fff;border:1px solid #e3d7cf;color:#3a2e2a}
+.btn.warn{background:#7a2b2b}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.instructions{font:14px/1.55 ui-sans-serif,system-ui;color:#5b4e47;margin:6px auto 10px;text-align:center;max-width:1100px}
 
 /* Layout */
 main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:360px 1fr;gap:16px}
-@media (max-width: 960px){ main{grid-template-columns:1fr} }
+@media (max-width:960px){ main{grid-template-columns:1fr} }
+
 .panel{background:linear-gradient(180deg,#fff,#fffaf8);border:1px solid #eee;border-radius:20px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.05)}
 .panel h2{font-size:18px;margin:0;padding:12px 14px;border-bottom:1px solid #f0e8e3;background:linear-gradient(90deg,#fff,#fff7f2)}
 .panel .content{padding:12px}
 .pill{display:flex;gap:8px;align-items:center;background:var(--pearl);border:1px solid #eadfd9;border-radius:999px;padding:8px 10px;margin-bottom:10px}
 .pill input{all:unset;flex:1;font:15px/1.2 ui-sans-serif,system-ui;color:#333}
-.btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:#222;color:#fff;font-weight:600;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.12)}
 .results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media (max-width: 480px){ .results{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:480px){ .results{grid-template-columns:repeat(2,1fr)} }
+
 .book-card{position:relative;border-radius:12px;overflow:hidden;background:#f5f1ee;border:1px solid #e9dfd8;display:flex;align-items:center;justify-content:center;cursor:grab;min-height:170px}
 .book-card img{width:100%;height:100%;object-fit:cover;display:block}
-.book-card .ttl{position:absolute;inset:auto 6px 6px 6px;background:linear-gradient(180deg,rgba(0,0,0,.0), rgba(0,0,0,.55));color:#fff;padding:6px 8px;border-radius:8px;font:12px/1.2 ui-sans-serif, system-ui}
+.book-card .ttl{position:absolute;left:6px;right:6px;bottom:6px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.55));color:#fff;padding:6px 8px;border-radius:8px;font:12px/1.2 ui-sans-serif,system-ui}
 
-/* Board */
+/* Workspace */
 .workspace{display:flex;flex-direction:column;gap:12px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .board-outer{display:flex;justify-content:center;align-items:center;padding:8px}
 .board{position:relative;width:380px;height:640px;border-radius:22px;background:linear-gradient(180deg,#f6ebe3,#fffdfa);box-shadow: inset 0 0 0 1px #ead8cf, inset 0 30px 80px rgba(190,150,120,.25), var(--shadow);overflow:hidden}
 @media (min-width:1024px){ .board{width:540px;height:960px} }
@@ -43,8 +54,9 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 .board::before{left:0;border-radius:22px 0 0 22px}
 .board::after{right:0;border-radius:0 22px 22px 0}
 
-/* Fairy lights (visible above shelves, with twinkle) */
-.fairy{position:absolute;top:56px;left:18px;right:18px;height:26px;pointer-events:none;z-index:2;
+/* Fairy lights */
+.fairy{
+  position:absolute; top:56px; left:18px; right:18px; height:26px; pointer-events:none; z-index:6;
   background:
     radial-gradient(7px 7px at 4% 55%,  rgba(255,240,180,.95), transparent 60%),
     radial-gradient(7px 7px at 13% 45%, rgba(255,220,200,.95), transparent 60%),
@@ -63,25 +75,26 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
   0% { opacity:.7; filter:drop-shadow(0 0 2px rgba(255,243,200,.7)); }
   100%{ opacity:1; filter:drop-shadow(0 0 6px rgba(255,243,200,1)); }
 }
-.fairy.hidden{display:none;}
+.fairy.hidden{display:none}
 
+/* Shelves and layering */
 .shelves{position:absolute;inset:72px 10px 76px 10px; z-index:1;}
 .shelf{position:absolute;left:8px;right:8px;border-radius:12px;background:linear-gradient(180deg,var(--wood1),var(--wood2));box-shadow:0 12px 26px rgba(0,0,0,.32), inset 0 2px 0 rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.28)}
 .shelf .plaque{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:12px;background:linear-gradient(180deg,#f6efe6,#ebdccf);border:1px solid #d6c2af;color:#6a5342;font:12px/1.1 ui-sans-serif,system-ui;box-shadow:inset 0 1px 0 #fff6}
 
 /* Books */
-.book{position:absolute;bottom:6px;max-height:calc(100% - 12px);border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease, box-shadow .2s ease}
+.book{position:absolute;bottom:var(--book-pad);max-height:calc(100% - (var(--book-pad)*2));border-radius:10px;box-shadow:0 12px 22px rgba(0,0,0,.30);transform:rotate(var(--rot, 0deg));transform-origin:bottom center;cursor:pointer;user-select:none;transition:transform .25s ease, filter .25s ease, box-shadow .2s ease; z-index:4;}
 .book:hover{filter:brightness(1.05)}
 .book.selected{box-shadow:0 0 0 3px #ffd7d7, 0 12px 22px rgba(0,0,0,.30)}
 .book img{height:100%;width:auto;object-fit:contain;border-radius:10px;display:block}
 .book::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,.14), transparent 18%, transparent 82%, rgba(255,255,255,.22));mix-blend-mode:soft-light;pointer-events:none}
 
-/* Remove button on hover */
-.remove-btn{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:999px;background:#fff;border:1px solid #e1c9c0;box-shadow:0 4px 10px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font:700 16px/1 ui-sans-serif,system-ui;color:#7a4a3a;opacity:0;transition:opacity .15s ease;cursor:pointer}
+/* Remove control */
+.remove-btn{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:999px;background:#fff;border:1px solid #e1c9c0;box-shadow:0 4px 10px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font:700 16px/1 ui-sans-serif,system-ui;color:#7a4a3a;opacity:0;transition:opacity .15s ease;cursor:pointer; z-index:5;}
 .book:hover .remove-btn{opacity:1}
 
-/* Bigger plants */
-.plant{position:absolute;bottom:10px;width:140px;height:140px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center bottom;background-repeat:no-repeat}
+/* Plants in FRONT */
+.plant{position:absolute;bottom:10px;width:140px;height:140px;border-radius:18px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.25);background-size:contain;background-position:center bottom;background-repeat:no-repeat;z-index:5;pointer-events:none}
 .plant.left{left:8px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants.png')}
 .plant.right{right:8px;background-image:url('https://raw.githubusercontent.com/jeanmhuang/bookshelf/main/plants2.png')}
 </style>
@@ -90,7 +103,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
 <header>
   <div class="bar">
     <h1 style="flex:1;text-align:center;font-family:'Georgia',serif;font-size:28px;font-weight:700;color:#3a2e2a;letter-spacing:.5px">✨ BookTok Aesthetic Bookshelf</h1>
-    <div style="display:flex;gap:16px;align-items:center;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
       <label>Shelves:
         <select id="shelfCount">
           <option value="2">2</option>
@@ -98,18 +111,20 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
         </select>
       </label>
       <label><input type="checkbox" id="lights" checked> Fairy Lights</label>
+      <button class="btn ghost" id="clearBtn" title="Remove all books">Clear Shelves</button>
+      <button class="btn" id="saveBtn" title="Save bookshelf as PNG">Save PNG</button>
     </div>
   </div>
   <div class="instructions">
     <strong>How it works:</strong>
-    Search a classic below (or pick one of the pre-populated options), drag a cover onto a shelf, and double-click a book to tilt it <strong>10°</strong> left or right.<br/>
-    <strong>Remove a book:</strong> hover a book and click the <strong>✕</strong>, or click a book (it highlights) and press <strong>Delete</strong>/<strong>Backspace</strong>.<br/>
-    Use the menu to change shelf count or toggle the fairy lights.
+    Pick a book below (or search), drag it onto a shelf, and double-click to tilt <strong>10°</strong> left or right.<br/>
+    <strong>Remove:</strong> click <strong>✕</strong> on hover, or select (pink outline) and press <strong>Delete</strong>/<strong>Backspace</strong>.<br/>
+    Books automatically <strong>space themselves</strong> so the shelf never looks crowded. Use the menu to change shelf count, toggle lights, <strong>Clear Shelves</strong>, or <strong>Save PNG</strong>.
   </div>
 </header>
 
 <main>
-  <section class="panel" aria-label="Search and picks">
+  <section class="panel" aria-label="Discover and search">
     <h2>Discover Classics</h2>
     <div class="content">
       <div class="pill">
@@ -117,7 +132,7 @@ main{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template
         <input id="q" placeholder="Search public-domain classics (e.g., pride and prejudice)"/>
         <button class="btn" id="go" aria-label="Search">Search</button>
       </div>
-      <div class="results" id="results" aria-live="polite"></div>
+      <div id="results" class="results" aria-live="polite"></div>
     </div>
   </section>
 
@@ -143,26 +158,30 @@ const shelvesEl     = $('#shelves');
 const shelfCountSel = $('#shelfCount');
 const lightsToggle  = $('#lights');
 const fairy         = $('#fairy');
+const clearBtn      = $('#clearBtn');
+const saveBtn       = $('#saveBtn');
 
 let selectedBook = null;
 
-/* ------- Curated picks for pre-populated grid ------- */
+/* ===== PRE-POPULATED, COVER-LOCKED GRID (title/author/cover match) ===== */
 const curated = [
-  {title:'Pride and Prejudice', author:'Jane Austen', cover_i:8231856},
-  {title:'Little Women', author:'Louisa May Alcott', cover_i:10523369},
-  {title:'Jane Eyre', author:'Charlotte Brontë', cover_i:10509349},
-  {title:'Wuthering Heights', author:'Emily Brontë', cover_i:8231561},
-  {title:'The Picture of Dorian Gray', author:'Oscar Wilde', cover_i:8231996},
-  {title:'Anna Karenina', author:'Leo Tolstoy', cover_i:10706347},
-  {title:'Emma', author:'Jane Austen', cover_i:10923255},
-  {title:'Sense and Sensibility', author:'Jane Austen', cover_i:8232100},
-  {title:'The Secret Garden', author:'Frances Hodgson Burnett', cover_i:8782474},
-  {title:'A Little Princess', author:'Frances Hodgson Burnett', cover_i:8231186},
-  {title:'Persuasion', author:'Jane Austen', cover_i:10526035},
-  {title:'The Scarlet Pimpernel', author:'Baroness Orczy', cover_i:8231721},
+  {title:'Pride and Prejudice', author:'Jane Austen',          coverId:8231856},
+  {title:'Little Women',        author:'Louisa May Alcott',    coverId:10523369},
+  {title:'Jane Eyre',           author:'Charlotte Brontë',     coverId:10509349},
+  {title:'Wuthering Heights',   author:'Emily Brontë',         coverId:8231561},
+  {title:'Dorian Gray',         author:'Oscar Wilde',          coverId:8231996},
+  {title:'Anna Karenina',       author:'Leo Tolstoy',          coverId:10706347},
+  {title:'Emma',                author:'Jane Austen',          coverId:10923255},
+  {title:'Sense & Sensibility', author:'Jane Austen',          coverId:8232100},
+  {title:'The Secret Garden',   author:'F. H. Burnett',        coverId:8782474},
+  {title:'A Little Princess',   author:'F. H. Burnett',        coverId:8231186},
+  {title:'Persuasion',          author:'Jane Austen',          coverId:10526035},
+  {title:'Scarlet Pimpernel',   author:'Baroness Orczy',       coverId:8231721},
 ];
 
-/* ------- Shelves ------- */
+function coverURLFromId(id){ return id ? `https://covers.openlibrary.org/b/id/${id}-L.jpg` : ''; }
+
+/* ===== SHELVES RENDER ===== */
 function renderShelves(count=3){
   shelvesEl.innerHTML='';
   const labels = count===2 ? ['Favorites','Classics'] : ['Top Picks','TBR','Classics'];
@@ -190,7 +209,7 @@ function renderShelves(count=3){
   bindShelfDnD();
 }
 
-/* ------- Drag & Drop ------- */
+/* ===== DND & BOOK PLACEMENT WITH SPACING ===== */
 function bindShelfDnD(){
   $$('.shelf').forEach(shelf => {
     shelf.addEventListener('dragover', e => e.preventDefault());
@@ -211,7 +230,7 @@ function placeBookOnShelf(shelf,{title,author,src},x){
   book.className = 'book';
   book.style.setProperty('--rot','0deg');
 
-  // Click to select (for Delete key removal)
+  // select for Delete
   book.addEventListener('click', (e)=>{
     if(selectedBook) selectedBook.classList.remove('selected');
     selectedBook = book;
@@ -219,7 +238,7 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     e.stopPropagation();
   });
 
-  // Double-click to toggle ±10°
+  // double-click tilt ±10°
   book.addEventListener('dblclick', ()=>{
     const current = (book.style.getPropertyValue('--rot')||'0deg').replace('deg','');
     const cur = parseFloat(current)||0;
@@ -228,7 +247,7 @@ function placeBookOnShelf(shelf,{title,author,src},x){
     book.style.transform = `rotate(${next}deg)`;
   });
 
-  // Remove button
+  // remove button
   const remove = document.createElement('button');
   remove.className = 'remove-btn';
   remove.setAttribute('aria-label','Remove book');
@@ -245,35 +264,85 @@ function placeBookOnShelf(shelf,{title,author,src},x){
   img.src = src || placeholderCover(title,author);
 
   img.onload = ()=>{
-    const targetH = shelf.clientHeight - 12; // nearly full shelf height
+    const targetH = shelf.clientHeight - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--book-pad'))*2 || 12);
     const scale = targetH / img.naturalHeight;
-    const w = Math.max(60, Math.round(img.naturalWidth * scale)); // preserve aspect ratio
+    const w = Math.max(60, Math.round(img.naturalWidth * scale));
     book.style.height = targetH + 'px';
     book.style.width = w + 'px';
 
+    // initial left proposal
     const leftLimit = 6;
     const rightLimit = shelf.clientWidth - w - 6;
-    let left = (x||40) - w/2;
+    let left = (x ?? 40) - w/2;
     left = Math.max(leftLimit, Math.min(left, rightLimit));
     book.style.left = left + 'px';
+
+    // mount, then enforce spacing among all books
+    shelf.appendChild(book);
+    book.appendChild(img);
+    book.appendChild(remove);
+    enforceSpacing(shelf);
   };
 
-  book.appendChild(img);
-  book.appendChild(remove);
-  shelf.appendChild(book);
+  img.onerror = ()=>{
+    shelf.appendChild(book);
+    book.appendChild(img);
+    book.appendChild(remove);
+    enforceSpacing(shelf);
+  };
 }
 
-/* ------- Placeholder cover (data URL SVG) ------- */
+/* Keep neat spacing between books with a minimum gutter */
+function enforceSpacing(shelf){
+  const gutter = 10; // px
+  const pad = 6;
+  const shelfW = shelf.clientWidth;
+  const books = Array.from(shelf.querySelectorAll('.book'));
+  if(!books.length) return;
+
+  // gather current sizes/positions
+  const arr = books.map(el=>{
+    const w = el.getBoundingClientRect().width || parseFloat(el.style.width) || 80;
+    const left = parseFloat(el.style.left) || 0;
+    return {el, w, left};
+  });
+  // sort by left
+  arr.sort((a,b)=>a.left - b.left);
+
+  // forward pass: push right to ensure min gaps
+  arr[0].left = Math.max(pad, arr[0].left);
+  for(let i=1;i<arr.length;i++){
+    const prev = arr[i-1];
+    const minLeft = prev.left + prev.w + gutter;
+    arr[i].left = Math.max(minLeft, arr[i].left);
+  }
+
+  // clamp last to right edge, then pull left if overflow
+  const overflow = (arr.at(-1).left + arr.at(-1).w + pad) - shelfW;
+  if(overflow > 0){
+    // pull everything left evenly (but not past pad/gaps)
+    for(let i=arr.length-1;i>=0;i--){
+      arr[i].left = Math.max(pad + i * gutter, arr[i].left - overflow);
+    }
+    // ensure gaps after pull
+    for(let i=1;i<arr.length;i++){
+      arr[i].left = Math.max(arr[i].left, arr[i-1].left + arr[i-1].w + gutter);
+    }
+  }
+
+  // commit positions
+  for(const it of arr){
+    it.el.style.left = Math.round(it.left) + 'px';
+  }
+}
+
+/* ===== PLACEHOLDER SVG FOR MISSING COVERS ===== */
 function placeholderCover(title,author){
   const t=(title||'Untitled').slice(0,36).replace(/&/g,'&amp;');
   const a=(author||'').slice(0,28).replace(/&/g,'&amp;');
   const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='550'>
-    <defs>
-      <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-        <stop offset='0%' stop-color='#d8ecff'/>
-        <stop offset='100%' stop-color='#ffe1ea'/>
-      </linearGradient>
-    </defs>
+    <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#d8ecff'/><stop offset='100%' stop-color='#ffe1ea'/></linearGradient></defs>
     <rect width='100%' height='100%' fill='url(#g)'/>
     <rect x='18' y='18' width='364' height='514' rx='14' fill='rgba(255,255,255,.4)' stroke='rgba(0,0,0,.06)'/>
     <text x='36' y='280' font-family='Georgia,serif' font-size='28' fill='#2b2a2a'>${t}</text>
@@ -282,44 +351,18 @@ function placeholderCover(title,author){
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 }
 
-/* ------- Search (Open Library) ------- */
-async function searchBooks(q){
-  resultsEl.innerHTML = '';
-  if(!q || !q.trim()){ renderCurated(); return; }
-
-  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&has_fulltext=true&language=eng&limit=24`;
-  try{
-    const res = await fetch(url);
-    const data = await res.json();
-    const docs = (data && data.docs) ? data.docs : [];
-    if(!docs.length){
-      resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No results. Try another classic?</div>`;
-      return;
-    }
-    const frag = document.createDocumentFragment();
-    docs.slice(0,24).forEach(d=>{
-      const card = makeCard(d);
-      frag.appendChild(card);
-    });
-    resultsEl.appendChild(frag);
-  }catch(err){
-    console.error(err);
-    resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">Search error. Please try again.</div>`;
-  }
-}
-
-function makeCard(d){
+/* ===== DISCOVER GRID (CURATED + SEARCH) ===== */
+function makeCardFromData({title, author, coverId, coverSrc}){
   const card = document.createElement('div');
   card.className = 'book-card';
-
-  const title  = d.title || 'Untitled';
-  const author = (d.author_name && d.author_name[0]) || d.author || '';
-  const coverId = d.cover_i;
-  const src = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : '';
+  const src = coverSrc || coverURLFromId(coverId) || '';
 
   if(src){
     const im=new Image();
-    im.src=src; im.alt=`${title} — ${author}`; im.loading='lazy';
+    im.decoding = 'async';
+    im.loading  = 'lazy';
+    im.src = src;
+    im.alt = `${title} — ${author||''}`;
     card.appendChild(im);
   }
   const ttl=document.createElement('div');
@@ -338,11 +381,56 @@ function makeCard(d){
 function renderCurated(){
   resultsEl.innerHTML = '';
   const frag = document.createDocumentFragment();
-  curated.forEach(d => frag.appendChild(makeCard(d)));
+  curated.forEach(d => {
+    frag.appendChild(makeCardFromData({title:d.title, author:d.author, coverId:d.coverId}));
+  });
   resultsEl.appendChild(frag);
 }
 
-/* ------- UI bindings ------- */
+async function searchBooks(q){
+  resultsEl.innerHTML = '';
+  if(!q || !q.trim()){ renderCurated(); return; }
+
+  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&has_fulltext=true&language=eng&limit=24`;
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+    const docs = Array.isArray(data.docs) ? data.docs : [];
+    if(!docs.length){
+      resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">No results. Try another classic?</div>`;
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    docs.slice(0,24).forEach(d=>{
+      const title  = d.title || 'Untitled';
+      const author = (d.author_name && d.author_name[0]) || '';
+      const coverId = d.cover_i;
+      frag.appendChild(makeCardFromData({title, author, coverId}));
+    });
+    resultsEl.appendChild(frag);
+  }catch(err){
+    console.error(err);
+    resultsEl.innerHTML = `<div style="grid-column:1/-1;color:#7b6d66;">Search error. Please try again.</div>`;
+  }
+}
+
+/* ===== UTIL ACTIONS ===== */
+function clearShelves(){
+  $$('.shelf .book').forEach(b => b.remove());
+  selectedBook = null;
+}
+
+async function savePNG(){
+  fairy.classList.toggle('hidden', !lightsToggle.checked);
+  const canvas = await html2canvas(board, {useCORS:true, backgroundColor:null, scale:2});
+  const data = canvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+  a.href = data; a.download = `booktok-shelf-${stamp}.png`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ===== BINDINGS ===== */
 $('#go').addEventListener('click', ()=> searchBooks($('#q').value));
 $('#q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ searchBooks($('#q').value); } });
 
@@ -351,12 +439,19 @@ shelfCountSel.addEventListener('change', ()=>{
   renderShelves(n);
 });
 
-// Solid fairy-lights toggle via class; ensure visible by default
 lightsToggle.addEventListener('change', ()=>{
   fairy.classList.toggle('hidden', !lightsToggle.checked);
 });
 
-// Delete/Backspace removes selected book
+clearBtn.addEventListener('click', ()=>{
+  if (event && (event.shiftKey || confirm('Clear all shelves?'))) clearShelves();
+});
+
+saveBtn.addEventListener('click', async ()=>{
+  saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+  try { await savePNG(); } finally { saveBtn.disabled = false; saveBtn.textContent = 'Save PNG'; }
+});
+
 document.addEventListener('keydown', (e)=>{
   if(!selectedBook) return;
   if(e.key === 'Delete' || e.key === 'Backspace'){
@@ -365,7 +460,6 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 
-// Deselect if clicking outside
 document.addEventListener('click', (e)=>{
   if(selectedBook && !e.target.closest('.book')){
     selectedBook.classList.remove('selected');
@@ -373,12 +467,13 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-/* ------- Init ------- */
+/* ===== INIT ===== */
 renderShelves(parseInt(shelfCountSel.value,10)||3);
 renderCurated();
-lightsToggle.checked = true;          // ensure default ON
-fairy.classList.remove('hidden');     // ensure visible at start
+lightsToggle.checked = true;
+fairy.classList.remove('hidden');
 </script>
 </body>
 </html>
+
 
